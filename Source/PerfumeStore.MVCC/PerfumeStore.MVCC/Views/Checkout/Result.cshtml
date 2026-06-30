@@ -1,0 +1,36 @@
+@model OrderResultViewModel
+
+@{
+    ViewData["Title"] = "Заказ оформлен";
+}
+
+<h1 class="h3 mb-4">Заказ успешно оформлен</h1>
+
+<div class="alert alert-success">
+    Спасибо за заказ! Ваш заказ принят в обработку.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-4">Номер заказа</dt>
+    <dd class="col-sm-8">@Model.OrderId</dd>
+
+    <dt class="col-sm-4">Дата</dt>
+    <dd class="col-sm-8">@Model.OrderDate.ToString("g")</dd>
+
+    <dt class="col-sm-4">Сумма</dt>
+    <dd class="col-sm-8">@Model.TotalAmount.ToString("N2")</dd>
+
+    <dt class="col-sm-4">Адрес доставки</dt>
+    <dd class="col-sm-8">@Model.DeliveryAddress</dd>
+
+    <dt class="col-sm-4">Способ доставки</dt>
+    <dd class="col-sm-8">@Model.DeliveryMethod</dd>
+
+    <dt class="col-sm-4">Способ оплаты</dt>
+    <dd class="col-sm-8">@Model.PaymentMethod</dd>
+
+    <dt class="col-sm-4">Статус</dt>
+    <dd class="col-sm-8">@Model.Status</dd>
+</dl>
+
+<a class="btn btn-dark" asp-controller="Catalog" asp-action="Index">Вернуться в каталог</a>

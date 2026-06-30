@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PerfumeStore.MVCC</title>
+    <title>@ViewData["Title"] - PerfumeStore</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PerfumeStore.MVCC.styles.css" asp-append-version="true" />
@@ -12,33 +12,67 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PerfumeStore.MVCC</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">PerfumeStore</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Catalog" asp-action="Index">Каталог</a>
                         </li>
+                        @if (User.IsInRole(UserRoles.Client))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">Корзина</a>
+                            </li>
+                        }
                     </ul>
+                    <form class="d-flex me-3" asp-controller="Catalog" asp-action="Search" method="get">
+                        <input class="form-control me-2" type="search" name="searchQuery" placeholder="Поиск" aria-label="Поиск" />
+                        <button class="btn btn-outline-dark" type="submit">Найти</button>
+                    </form>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-link text-dark text-decoration-none" type="submit">Выйти</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-dark" asp-controller="Account" asp-action="Register">Регистрация</a>
+                            <a class="btn btn-dark" asp-controller="Account" asp-action="Login">Войти</a>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["SuccessMessage"] is string successMessage)
+            {
+                <div class="alert alert-success">@successMessage</div>
+            }
+
+            @if (TempData["ErrorMessage"] is string errorMessage)
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - PerfumeStore.MVCC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - PerfumeStore
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

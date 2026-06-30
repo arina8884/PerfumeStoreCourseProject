@@ -1,0 +1,91 @@
+@model CartViewModel
+
+@{
+    ViewData["Title"] = "Корзина";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Корзина</h1>
+        <p class="text-muted mb-0">Товары, выбранные для оформления заказа.</p>
+    </div>
+    <a class="btn btn-outline-dark" asp-controller="Catalog" asp-action="Index">Продолжить покупки</a>
+</div>
+
+@if (Model.IsEmpty)
+{
+    <div class="alert alert-light border">
+        Корзина пуста. Перейдите в каталог, чтобы выбрать товары.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <section class="col-lg-8">
+            @foreach (var item in Model.Items)
+            {
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-3 bg-light d-flex align-items-center justify-content-center">
+                            <img class="img-fluid p-3" src="@(item.ImageUrl ?? "/images/products/no-image.png")" alt="@item.ProductName" />
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <div>
+                                        <div class="text-muted small">@item.Brand</div>
+                                        <h2 class="h5 mb-1">
+                                            <a class="text-dark text-decoration-none" href="/product/@item.ProductId">@item.ProductName</a>
+                                        </h2>
+                                        <p class="mb-1">Объем: @item.Volume мл</p>
+                                        <p class="mb-1">Цена: @item.Price.ToString("N2")</p>
+                                        <p class="text-muted mb-0">Доступно: @item.StockQuantity</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">@item.TotalPrice.ToString("N2")</div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="d-flex gap-2 align-items-center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cartItemId" value="@item.Id" />
+                                        <input class="form-control" type="number" name="quantity" value="@item.Quantity" min="1" max="@item.StockQuantity" style="width: 90px;" />
+                                        <button class="btn btn-outline-dark" type="submit">Обновить</button>
+                                    </form>
+
+                                    <form asp-controller="Cart" asp-action="Remove" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cartItemId" value="@item.Id" />
+                                        <button class="btn btn-outline-danger" type="submit">Удалить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <aside class="col-lg-4">
+            <div class="border rounded-3 p-4">
+                <h2 class="h5">Итого</h2>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Товаров</span>
+                    <span>@Model.Items.Sum(item => item.Quantity)</span>
+                </div>
+                <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+                    <span>Сумма</span>
+                    <span>@Model.TotalAmount.ToString("N2")</span>
+                </div>
+
+                <a class="btn btn-dark w-100 mb-2" asp-controller="Checkout" asp-action="Index">Оформить заказ</a>
+
+                <form asp-controller="Cart" asp-action="Clear" method="post">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-outline-danger w-100" type="submit">Очистить корзину</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+}

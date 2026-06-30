@@ -1,0 +1,60 @@
+@model ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Главная</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Catalog" asp-action="Index">Каталог</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-5">
+    <div class="col-md-5">
+        <div class="border rounded-3 bg-light p-4 text-center">
+            <img class="img-fluid" src="@(Model.ImageUrl ?? "/images/products/no-image.png")" alt="@Model.Name" />
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="text-muted mb-2">@Model.CategoryName</div>
+        <h1>@Model.Name</h1>
+        <p class="h5 text-muted">@Model.Brand</p>
+
+        <dl class="row mt-4">
+            <dt class="col-sm-3">Цена</dt>
+            <dd class="col-sm-9 fw-bold">@Model.Price.ToString("N2")</dd>
+
+            <dt class="col-sm-3">Объем</dt>
+            <dd class="col-sm-9">@Model.Volume мл</dd>
+
+            <dt class="col-sm-3">Остаток</dt>
+            <dd class="col-sm-9">@Model.StockQuantity</dd>
+        </dl>
+
+        <h2 class="h5 mt-4">Описание</h2>
+        <p>@(Model.Description ?? "Описание отсутствует.")</p>
+
+        <div class="d-flex flex-wrap gap-2">
+            @if (User.IsInRole(UserRoles.Client))
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <input class="form-control" type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" style="width: 90px;" />
+                    <button class="btn btn-dark" type="submit" disabled="@(Model.StockQuantity <= 0)">В корзину</button>
+                </form>
+            }
+            else
+            {
+                <a class="btn btn-dark" asp-controller="Account" asp-action="Login">Войти для покупки</a>
+            }
+
+            <a class="btn btn-outline-dark" asp-controller="Catalog" asp-action="Index">Вернуться в каталог</a>
+        </div>
+    </div>
+</div>
