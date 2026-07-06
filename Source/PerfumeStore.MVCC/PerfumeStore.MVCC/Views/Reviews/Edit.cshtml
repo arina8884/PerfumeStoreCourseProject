@@ -1,0 +1,80 @@
+@model ReviewEditViewModel
+
+
+
+@{
+
+    ViewData["Title"] = "Редактирование отзыва";
+
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = "Редактирование отзыва",
+
+    Subtitle = $"Товар: {Model.ProductName}",
+
+    Icon = "bi-pencil"
+
+})" />
+
+
+
+<form asp-action="Edit" asp-route-id="@Model.ReviewId" method="post" class="store-panel store-form">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="ReviewId" />
+
+    <input type="hidden" asp-for="ProductId" />
+
+    <input type="hidden" asp-for="ProductName" />
+
+
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+
+
+    <div class="mb-3">
+
+        <label asp-for="Rating" class="form-label">Оценка</label>
+
+        <select asp-for="Rating" class="form-select" style="max-width: 120px;">
+
+            @for (var rating = 5; rating >= 1; rating--)
+
+            {
+
+                <option value="@rating">@rating</option>
+
+            }
+
+        </select>
+
+        <span asp-validation-for="Rating" class="text-danger"></span>
+
+    </div>
+
+
+
+    <div class="mb-2">
+
+        <label asp-for="Comment" class="form-label">Комментарий</label>
+
+        <textarea asp-for="Comment" class="form-control" rows="4" placeholder="Поделитесь впечатлением о товаре"></textarea>
+
+        <span asp-validation-for="Comment" class="text-danger"></span>
+
+    </div>
+
+
+
+    @{ ViewData["SubmitText"] = "Сохранить"; ViewData["CancelUrl"] = Url.Action("Index"); }
+
+    <partial name="_FormActions" />
+
+</form>
+

@@ -1,0 +1,17 @@
+@model PageHeaderViewModel
+
+<div class="store-page-header mb-4">
+    @if (!string.IsNullOrWhiteSpace(Model.Icon))
+    {
+        <div class="store-page-header-icon">
+            <i class="bi @Model.Icon"></i>
+        </div>
+    }
+    <div>
+        <h1 class="h3 mb-1">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+        {
+            <p class="text-muted mb-0">@Model.Subtitle</p>
+        }
+    </div>
+</div>

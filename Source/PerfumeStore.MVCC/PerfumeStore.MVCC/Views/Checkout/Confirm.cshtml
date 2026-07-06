@@ -2,37 +2,55 @@
 
 @{
     ViewData["Title"] = "Подтверждение заказа";
+    ViewData["CheckoutStep"] = 4;
 }
 
-<h1 class="h3 mb-4">Подтверждение заказа</h1>
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Подтверждение заказа",
+    Subtitle = "Проверьте данные перед оформлением",
+    Icon = "bi-clipboard-check"
+})" />
 
-<div class="mb-4">
-    <h2 class="h5">Состав заказа</h2>
-    <ul class="list-group">
-        @foreach (var item in Model.Items)
-        {
-            <li class="list-group-item d-flex justify-content-between">
-                <span>@item.ProductName (@item.Quantity шт.)</span>
-                <span>@item.TotalPrice.ToString("N2")</span>
-            </li>
-        }
-    </ul>
-    <p class="fw-bold mt-3">Итого: @Model.TotalAmount.ToString("N2")</p>
+<partial name="_CheckoutSteps" />
+
+<div class="store-panel mb-4">
+    <div class="store-panel-title mb-3"><i class="bi bi-list-check me-2"></i>Состав заказа</div>
+    <div class="table-responsive">
+        <table class="table store-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th class="text-end">Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.ProductName <span class="text-muted">(@item.Quantity шт.)</span></td>
+                        <td class="text-end">@item.TotalPrice.ToString("N2") BYN</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="fw-bold mt-3 mb-0">Итого: @Model.TotalAmount.ToString("N2") BYN</p>
 </div>
 
-<dl class="row mb-4">
-    <dt class="col-sm-3">Адрес</dt>
-    <dd class="col-sm-9">@Model.DeliveryAddress</dd>
+<div class="store-panel mb-4">
+    <div class="store-panel-title mb-3"><i class="bi bi-info-circle me-2"></i>Детали доставки и оплаты</div>
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Адрес</dt>
+        <dd class="col-sm-9">@Model.DeliveryAddress</dd>
+        <dt class="col-sm-3">Доставка</dt>
+        <dd class="col-sm-9">@Model.DeliveryMethod</dd>
+        <dt class="col-sm-3">Оплата</dt>
+        <dd class="col-sm-9">@Model.PaymentMethod</dd>
+    </dl>
+</div>
 
-    <dt class="col-sm-3">Доставка</dt>
-    <dd class="col-sm-9">@Model.DeliveryMethod</dd>
-
-    <dt class="col-sm-3">Оплата</dt>
-    <dd class="col-sm-9">@Model.PaymentMethod</dd>
-</dl>
-
-<form asp-action="Confirm" asp-controller="Checkout" method="post">
+<form asp-action="Confirm" asp-controller="Checkout" method="post" class="store-form">
     @Html.AntiForgeryToken()
-    <button class="btn btn-dark" type="submit">Подтвердить заказ</button>
-    <a class="btn btn-outline-dark ms-2" asp-controller="Checkout" asp-action="Payment">Назад</a>
+    @{ ViewData["SubmitText"] = "Подтвердить заказ"; ViewData["CancelUrl"] = Url.Action("Payment"); ViewData["CancelText"] = "Назад"; }
+    <partial name="_FormActions" />
 </form>

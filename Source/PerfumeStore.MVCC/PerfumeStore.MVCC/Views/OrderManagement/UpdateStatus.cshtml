@@ -1,0 +1,49 @@
+@model OrderStatusUpdateViewModel
+
+@{
+    ViewData["Title"] = $"Статус заказа #{Model.OrderId}";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = $"Изменение статуса заказа №{Model.OrderId}",
+    Subtitle = "Выберите следующий этап обработки заказа",
+    Icon = "bi-arrow-repeat"
+})" />
+
+<p class="mb-4">Текущий статус: <partial name="_OrderStatusBadge" model="@Model.CurrentStatus" /></p>
+
+<form asp-action="UpdateStatus" asp-route-id="@Model.OrderId" method="post" class="store-panel">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="OrderId" />
+    <input type="hidden" asp-for="CurrentStatus" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @if (Model.AvailableStatuses.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+            Title = "Изменение недоступно",
+            Description = "Для текущего статуса заказа переход на другой этап невозможен",
+            Icon = "bi-lock"
+        })" />
+        <a class="btn btn-outline-dark mt-3" asp-action="Details" asp-route-id="@Model.OrderId"><i class="bi bi-arrow-left me-1"></i>Назад</a>
+    }
+    else
+    {
+        <div class="mb-4">
+            <label asp-for="Status" class="form-label">Новый статус</label>
+            <select asp-for="Status" class="form-select" style="max-width: 320px;">
+                @foreach (var status in Model.AvailableStatuses)
+                {
+                    <option value="@status">@OrderStatusHelper.ToDisplayName(status)</option>
+                }
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-dark" type="submit"><i class="bi bi-check-lg me-1"></i>Сохранить</button>
+            <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@Model.OrderId">Отмена</a>
+        </div>
+    }
+</form>

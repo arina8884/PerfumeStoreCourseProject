@@ -1,0 +1,65 @@
+@model ProductCardViewModel
+@{
+    var showActions = ViewData["ShowActions"] as bool? ?? false;
+    var returnUrl = ViewData["ReturnUrl"] as string ?? (Context.Request.Path + Context.Request.QueryString);
+}
+
+<article class="product-card-store h-100 w-100 d-flex flex-column">
+    <a asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id" class="product-card-image-wrap text-decoration-none">
+        <partial name="_ProductImage" view-data='new ViewDataDictionary(ViewData) { { "ImageUrl", Model.ImageUrl }, { "ImageAlt", Model.Name }, { "ImageClass", "w-100 product-card-image" } }' />
+    </a>
+    <div class="p-3 d-flex flex-column flex-grow-1">
+        <div class="text-muted small">@Model.CategoryName</div>
+        <div class="text-muted small mb-1">@Model.Brand</div>
+        <h2 class="h6 product-card-title mb-1">
+            <a class="text-dark text-decoration-none" asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a>
+        </h2>
+        <p class="mb-2 small text-muted">@Model.Volume мл</p>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <span class="badge @StockStatusHelper.ToBadgeClass(Model.StockQuantity)">@StockStatusHelper.ToDisplayName(Model.StockQuantity)</span>
+            @if (Model.ReviewsCount > 0 && Model.AverageRating.HasValue)
+            {
+                <span class="small text-muted product-card-rating"><i class="bi bi-star-fill text-warning"></i> @Model.AverageRating.Value.ToString("0.0") <span class="text-muted">(@Model.ReviewsCount)</span></span>
+            }
+            else
+            {
+                <span class="small text-muted">Нет отзывов</span>
+            }
+        </div>
+        <p class="fw-bold product-card-price mb-3">@Model.Price.ToString("N2") <span class="text-muted small fw-normal">BYN</span></p>
+        <div class="mt-auto product-card-actions d-grid gap-2">
+            <a class="btn btn-outline-dark btn-sm" asp-controller="Product" asp-action="Details" asp-route-id="@Model.Id">Подробнее</a>
+            @if (showActions && User.IsInRole(UserRoles.Client))
+            {
+                @if (Model.StockQuantity > 0)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button class="btn btn-dark btn-sm w-100" type="submit"><i class="bi bi-cart-plus me-1"></i>В корзину</button>
+                    </form>
+                }
+                <div class="row g-2">
+                    <div class="col-6">
+                        <form asp-controller="Favorites" asp-action="Add" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button class="btn btn-outline-secondary btn-sm w-100" type="submit"><i class="bi bi-heart me-1"></i>В избранное</button>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <form asp-controller="Compare" asp-action="Add" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button class="btn btn-outline-secondary btn-sm w-100" type="submit"><i class="bi bi-sliders me-1"></i>Сравнить</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</article>

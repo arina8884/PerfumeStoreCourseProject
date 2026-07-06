@@ -1,0 +1,13 @@
+@{
+    var cancelUrl = ViewData["CancelUrl"] as string;
+    var submitText = ViewData["SubmitText"] as string ?? "Сохранить";
+    var cancelText = ViewData["CancelText"] as string ?? "Отмена";
+}
+
+<div class="store-form-actions d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+    <button class="btn btn-dark" type="submit"><i class="bi bi-check-lg me-1"></i>@submitText</button>
+    @if (!string.IsNullOrWhiteSpace(cancelUrl))
+    {
+        <a class="btn btn-outline-dark" href="@cancelUrl">@cancelText</a>
+    }
+</div>

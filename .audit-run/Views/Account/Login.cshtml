@@ -1,0 +1,117 @@
+@model LoginViewModel
+
+
+
+@{
+    ViewData["Title"] = "Вход";
+    ViewData["MetaDescription"] = "Вход в личный кабинет PerfumeStore — авторизация для покупателей и сотрудников.";
+}
+
+
+
+<div class="row justify-content-center">
+
+    <div class="col-md-7 col-lg-5">
+
+        <partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+            Title = "Вход",
+
+            Subtitle = "Войдите в аккаунт для оформления заказов и управления профилем.",
+
+            Icon = "bi-box-arrow-in-right"
+
+        })" />
+
+
+
+        <form asp-action="Login" asp-controller="Account" method="post" class="store-panel store-form">
+
+            @Html.AntiForgeryToken()
+
+
+
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+
+
+            <div class="mb-3">
+
+                <label asp-for="Email" class="form-label">Email</label>
+
+                <input asp-for="Email" class="form-control" placeholder="example@mail.by" />
+
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+            </div>
+
+
+
+            <div class="mb-3">
+
+                <label asp-for="Password" class="form-label">Пароль</label>
+
+                <div class="password-toggle-wrap">
+
+                    <input asp-for="Password" class="form-control pe-5" id="login-password" type="password" autocomplete="current-password" placeholder="Введите пароль" />
+
+                    <button class="password-toggle-btn" type="button" data-password-toggle="#login-password" aria-label="Показать пароль">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5 8-5.5 8-5.5M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+
+                        </svg>
+
+                    </button>
+
+                </div>
+
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+            </div>
+
+
+
+            <div class="form-check mb-4">
+
+                <input asp-for="RememberMe" class="form-check-input" />
+
+                <label asp-for="RememberMe" class="form-check-label">Запомнить меня</label>
+
+            </div>
+
+
+
+            <button class="btn btn-dark w-100" type="submit">Войти</button>
+
+        </form>
+
+
+
+        <p class="mt-3 mb-0 text-center">
+
+            Нет аккаунта?
+
+            <a asp-controller="Account" asp-action="Register">Зарегистрироваться</a>
+
+        </p>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}
+

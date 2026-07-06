@@ -1,0 +1,37 @@
+@model UserManageViewModel
+
+
+
+@{
+
+    ViewData["Title"] = "Редактирование пользователя";
+
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = "Редактирование пользователя",
+
+    Subtitle = "Измените данные и роль учётной записи",
+
+    Icon = "bi-person-gear"
+
+})" />
+
+
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="store-panel store-form">
+
+    @Html.AntiForgeryToken()
+
+    <partial name="_UserManageForm" model="Model" />
+
+    @{ ViewData["SubmitText"] = "Сохранить"; ViewData["CancelUrl"] = Url.Action("Details", new { id = Model.Id }); }
+
+    <partial name="_FormActions" />
+
+</form>
+
+

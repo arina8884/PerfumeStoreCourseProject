@@ -1,0 +1,143 @@
+@model ReportsViewModel
+
+
+
+@{
+    ViewData["Title"] = "Отчёты";
+    ViewData["MetaDescription"] = "Отчёты PerfumeStore — статистика системы и экспорт данных в Excel, PDF и Word.";
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = "Отчёты",
+
+    Subtitle = "Сводные показатели системы с возможностью экспорта в Excel, PDF и Word.",
+
+    Icon = "bi-file-earmark-bar-graph"
+
+})" />
+
+
+
+<div class="store-panel mb-4">
+
+    <div class="row g-3 align-items-center">
+
+        <div class="col-md-8">
+
+            <div class="store-panel-title mb-1"><i class="bi bi-speedometer2 me-2"></i>Статистика системы</div>
+
+            <p class="text-muted small mb-0">Актуальные показатели на момент формирования страницы.</p>
+
+        </div>
+
+        <div class="col-md-4 text-md-end">
+
+            <span class="text-muted small"><i class="bi bi-clock me-1"></i>Дата формирования:</span>
+
+            <div class="fw-semibold">@Model.GeneratedAt.ToString("g")</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Пользователи", Value = Model.UsersCount.ToString(), Icon = "bi-people" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Товары", Value = Model.ProductsCount.ToString(), Icon = "bi-box-seam" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Заказы", Value = Model.OrdersCount.ToString(), Icon = "bi-bag-check" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Поставщики", Value = Model.SuppliersCount.ToString(), Icon = "bi-truck" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Заявки", Value = Model.SupplyRequestsCount.ToString(), Icon = "bi-clipboard-check" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-2"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Категории", Value = Model.CategoriesCount.ToString(), Icon = "bi-grid" })" /></div>
+
+</div>
+
+
+
+<div class="row g-4 mb-4">
+
+    @{
+
+        var reports = new[]
+
+        {
+
+            new { Title = "Отчёт по пользователям", Icon = "bi-people", Desc = "Список учётных записей клиентов и сотрудников с ролями и датами регистрации.", Count = Model.UsersCount },
+
+            new { Title = "Отчёт по заказам", Icon = "bi-bag-check", Desc = "Сводка заказов: статусы, суммы, клиенты и даты оформления.", Count = Model.OrdersCount },
+
+            new { Title = "Отчёт по товарам", Icon = "bi-box-seam", Desc = "Каталог товаров: бренды, категории, цены, остатки и статус активности.", Count = Model.ProductsCount },
+
+            new { Title = "Отчёт по поставщикам", Icon = "bi-truck", Desc = "Контактные данные партнёров для закупок и пополнения склада.", Count = Model.SuppliersCount },
+
+            new { Title = "Отчёт по заявкам", Icon = "bi-clipboard-check", Desc = "Заявки поставщикам: статусы, позиции и ответственные сотрудники.", Count = Model.SupplyRequestsCount },
+
+            new { Title = "Отчёт по категориям", Icon = "bi-grid", Desc = "Структура каталога: названия и описания категорий товаров.", Count = Model.CategoriesCount }
+
+        };
+
+    }
+
+    @foreach (var report in reports)
+
+    {
+
+        <div class="col-md-6 col-xl-4">
+
+            <div class="report-card">
+
+                <h2 class="h6 mb-2"><i class="bi @report.Icon me-1"></i>@report.Title</h2>
+
+                <p class="small text-muted">@report.Desc</p>
+
+                <p class="mb-3">Записей: <strong>@report.Count</strong></p>
+
+                <div class="report-card-actions d-flex flex-wrap gap-2">
+
+                    <a class="btn btn-sm btn-outline-dark" asp-action="ExportExcel"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+
+                    <a class="btn btn-sm btn-outline-dark" asp-action="ExportPdf"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</a>
+
+                    <a class="btn btn-sm btn-outline-dark" asp-action="ExportWord"><i class="bi bi-file-earmark-word me-1"></i>Word</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>
+
+
+
+<div class="store-panel">
+
+    <div class="store-panel-title"><i class="bi bi-download me-2"></i>Полный экспорт системы</div>
+
+    <p class="text-muted small mb-3">Единый файл со всеми разделами: пользователи, заказы, товары, поставщики, заявки и категории.</p>
+
+    <div class="d-flex flex-wrap gap-2">
+
+        <a class="btn btn-dark" asp-action="ExportExcel"><i class="bi bi-file-earmark-excel me-1"></i>Экспорт Excel</a>
+
+        <a class="btn btn-outline-dark" asp-action="ExportPdf"><i class="bi bi-file-earmark-pdf me-1"></i>Экспорт PDF</a>
+
+        <a class="btn btn-outline-dark" asp-action="ExportWord"><i class="bi bi-file-earmark-word me-1"></i>Экспорт Word</a>
+
+    </div>
+
+</div>
+

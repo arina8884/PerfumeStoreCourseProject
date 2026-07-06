@@ -1,0 +1,13 @@
+@model OrderQueueViewModel
+
+@{
+    ViewData["Title"] = "Очередь заказов";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Очередь заказов",
+    Subtitle = "Заказы со статусом New, ожидающие обработки.",
+    Icon = "bi-inbox"
+})" />
+
+<partial name="_ManagerOrderTable" model="Model.Orders" />

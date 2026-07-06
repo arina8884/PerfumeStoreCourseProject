@@ -1,0 +1,243 @@
+@model OrderManagerDashboardViewModel
+
+
+
+@{
+    ViewData["Title"] = "Панель менеджера заказов";
+    ViewData["MetaDescription"] = "Панель менеджера заказов PerfumeStore — очередь заказов, склад и поставщики.";
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = "Панель менеджера заказов",
+
+    Subtitle = "Заказы, поставщики, склад и заявки на пополнение.",
+
+    Icon = "bi-truck"
+
+})" />
+
+
+
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Новые заказы", Value = Model.NewOrdersCount.ToString(), Icon = "bi-bell" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "В работе", Value = Model.InProgressOrdersCount.ToString(), Icon = "bi-hourglass-split" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Доставлено", Value = Model.CompletedOrdersCount.ToString(), Icon = "bi-check2-circle" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Поставщики", Value = Model.SuppliersCount.ToString(), Icon = "bi-building" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Активные заявки", Value = Model.ActiveSupplyRequestsCount.ToString(), Icon = "bi-clipboard-check" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Нет в наличии", Value = Model.OutOfStockCount.ToString(), Icon = "bi-exclamation-triangle" })" /></div>
+
+    <div class="col-6 col-md-4 col-xl-3"><partial name="_StatCard" model="@(new StatCardViewModel { Label = "Заканчивается", Value = Model.LowStockCount.ToString(), Icon = "bi-graph-down" })" /></div>
+
+</div>
+
+
+
+<div class="store-panel mb-4">
+
+    <div class="store-panel-title"><i class="bi bi-lightning me-2"></i>Быстрые действия</div>
+
+    <div class="d-flex flex-wrap gap-2 store-quick-actions">
+
+        <a class="btn btn-dark" asp-controller="OrderManagement" asp-action="Queue"><i class="bi bi-inboxes me-1"></i>Очередь заказов</a>
+
+        <a class="btn btn-outline-dark" asp-controller="Supplier" asp-action="Index"><i class="bi bi-building me-1"></i>Поставщики</a>
+
+        <a class="btn btn-outline-dark" asp-controller="SupplyRequest" asp-action="Index"><i class="bi bi-clipboard-check me-1"></i>Заявки</a>
+
+        <a class="btn btn-outline-dark" asp-controller="Warehouse" asp-action="Index"><i class="bi bi-boxes me-1"></i>Склад</a>
+
+    </div>
+
+</div>
+
+
+
+<div class="store-panel mb-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="store-panel-title mb-0"><i class="bi bi-list-task me-2"></i>Очередь новых заказов</div>
+
+        <a class="btn btn-sm btn-outline-dark" asp-controller="OrderManagement" asp-action="Queue">Вся очередь</a>
+
+    </div>
+
+    <partial name="_ManagerOrderTable" model="Model.QueueOrders" />
+
+</div>
+
+
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-6">
+
+        <div class="store-panel h-100">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div class="store-panel-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Заявки поставщикам</div>
+
+                <a class="btn btn-sm btn-outline-dark" asp-controller="SupplyRequest" asp-action="Index">Все заявки</a>
+
+            </div>
+
+            @if (Model.RecentSupplyRequests.Count == 0)
+
+            {
+
+                <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+
+                    Title = "Заявок пока нет",
+
+                    Description = "Создайте заявку для пополнения склада.",
+
+                    Icon = "bi-clipboard",
+
+                    ButtonText = "Создать заявку",
+
+                    ButtonController = "SupplyRequest",
+
+                    ButtonAction = "Create"
+
+                })" />
+
+            }
+
+            else
+
+            {
+
+                <div class="table-responsive">
+
+                    <table class="table store-table align-middle mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>№</th>
+
+                                <th>Поставщик</th>
+
+                                <th>Статус</th>
+
+                                <th class="text-end">Действия</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var request in Model.RecentSupplyRequests)
+
+                            {
+
+                                <tr>
+
+                                    <td>#@request.Id</td>
+
+                                    <td>@request.SupplierName</td>
+
+                                    <td><partial name="_SupplyRequestStatusBadge" model="@request.Status" /></td>
+
+                                    <td class="text-end">
+
+                                        <a class="btn btn-sm btn-outline-dark" asp-controller="SupplyRequest" asp-action="Details" asp-route-id="@request.Id">Открыть</a>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="store-panel h-100">
+
+            <div class="store-panel-title"><i class="bi bi-graph-down me-2"></i>Товары с минимальным остатком</div>
+
+            @if (Model.LowStockProducts.Count == 0)
+
+            {
+
+                <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+
+                    Title = "Критичных остатков нет",
+
+                    Description = "Все активные товары имеют достаточный запас на складе.",
+
+                    Icon = "bi-check-circle"
+
+                })" />
+
+            }
+
+            else
+
+            {
+
+                <ul class="list-group list-group-flush">
+
+                    @foreach (var product in Model.LowStockProducts)
+
+                    {
+
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+
+                            <span>@product.Name <span class="text-muted small">· @product.Brand</span></span>
+
+                            <span class="badge @StockStatusHelper.ToBadgeClass(product.StockQuantity)">@product.StockQuantity шт.</span>
+
+                        </li>
+
+                    }
+
+                </ul>
+
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="store-panel">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="store-panel-title mb-0"><i class="bi bi-bag me-2"></i>Последние заказы</div>
+
+        <a class="btn btn-sm btn-outline-dark" asp-controller="OrderManagement" asp-action="Index">Все заказы</a>
+
+    </div>
+
+    <partial name="_ManagerOrderTable" model="Model.RecentOrders" />
+
+</div>
+

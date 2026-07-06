@@ -2,37 +2,55 @@
 
 @{
     ViewData["Title"] = "Оформление заказа";
+    ViewData["MetaDescription"] = "Оформление заказа в PerfumeStore — контактные данные и адрес доставки.";
+    ViewData["CheckoutStep"] = 2;
 }
 
-<h1 class="h3 mb-4">Оформление заказа</h1>
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Оформление заказа",
+    Subtitle = "Проверьте состав заказа и укажите адрес доставки",
+    Icon = "bi-bag-check"
+})" />
 
-<form asp-action="Index" asp-controller="Checkout" method="post">
+<partial name="_CheckoutSteps" />
+
+<form asp-action="Index" asp-controller="Checkout" method="post" class="store-panel store-form">
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="mb-4">
-        <h2 class="h5">Состав заказа</h2>
-        <ul class="list-group">
-            @foreach (var item in Model.Items)
-            {
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>@item.ProductName (@item.Quantity шт.)</span>
-                    <span>@item.TotalPrice.ToString("N2")</span>
-                </li>
-            }
-        </ul>
-        <p class="fw-bold mt-3">Итого: @Model.TotalAmount.ToString("N2")</p>
+        <div class="store-panel-title mb-3"><i class="bi bi-list-check me-2"></i>Состав заказа</div>
+        <div class="table-responsive">
+            <table class="table store-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th class="text-end">Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductName <span class="text-muted">(@item.Quantity шт.)</span></td>
+                            <td class="text-end">@item.TotalPrice.ToString("N2") BYN</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="fw-bold mt-3 mb-0">Итого: @Model.TotalAmount.ToString("N2") BYN</p>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-2">
         <label asp-for="DeliveryAddress" class="form-label">Адрес доставки</label>
-        <textarea asp-for="DeliveryAddress" class="form-control" rows="3"></textarea>
+        <textarea asp-for="DeliveryAddress" class="form-control" rows="3" placeholder="Укажите город, улицу, дом и квартиру"></textarea>
         <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-dark" type="submit">Продолжить</button>
-    <a class="btn btn-outline-dark ms-2" asp-controller="Cart" asp-action="Index">Вернуться в корзину</a>
+    @{ ViewData["SubmitText"] = "Продолжить"; ViewData["CancelUrl"] = Url.Action("Index", "Cart"); ViewData["CancelText"] = "Вернуться в корзину"; }
+    <partial name="_FormActions" />
 </form>
 
 @section Scripts {

@@ -1,0 +1,23 @@
+@{
+    var currentStep = ViewData["CheckoutStep"] as int? ?? 1;
+}
+
+<div class="checkout-steps mb-4">
+    @{
+        var steps = new[] { "Корзина", "Доставка", "Оплата", "Подтверждение", "Готово" };
+        for (var i = 0; i < steps.Length; i++)
+        {
+            var stepNumber = i + 1;
+            var isActive = stepNumber == currentStep;
+            var isCompleted = stepNumber < currentStep;
+            <div class="checkout-step @(isActive ? "active" : null) @(isCompleted ? "completed" : null)">
+                <span class="checkout-step-number">@stepNumber</span>
+                <span class="checkout-step-label">@steps[i]</span>
+            </div>
+            if (i < steps.Length - 1)
+            {
+                <div class="checkout-step-divider @(isCompleted ? "completed" : null)"></div>
+            }
+        }
+    }
+</div>

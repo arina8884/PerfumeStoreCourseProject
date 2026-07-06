@@ -1,0 +1,41 @@
+@model EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Редактирование профиля";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Редактирование профиля",
+    Subtitle = "Обновите контактные данные вашего аккаунта.",
+    Icon = "bi-person-gear"
+})" />
+
+<form asp-action="Edit" method="post" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label">ФИО</label>
+        <input asp-for="FullName" class="form-control" placeholder="Введите ФИО" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <p class="form-control-plaintext mb-0">@Model.Email</p>
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="Phone" class="form-label">Телефон</label>
+        <input asp-for="Phone" class="form-control" placeholder="+375 (__) ___-__-__" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    @{ ViewData["SubmitText"] = "Сохранить"; ViewData["CancelUrl"] = Url.Action("Index"); }
+    <partial name="_FormActions" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

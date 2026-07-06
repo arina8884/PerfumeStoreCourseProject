@@ -1,0 +1,76 @@
+@model WarehouseViewModel
+
+@{
+    ViewData["Title"] = "Склад";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Склад",
+    Subtitle = "Остатки товаров и их текущий статус на складе.",
+    Icon = "bi-boxes"
+})" />
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <partial name="_StatCard" model="@(new StatCardViewModel { Label = "Всего товаров", Value = Model.TotalProducts.ToString(), Icon = "bi-box" })" />
+    </div>
+    <div class="col-6 col-md-3">
+        <partial name="_StatCard" model="@(new StatCardViewModel { Label = "Активных", Value = Model.ActiveProducts.ToString(), Icon = "bi-check-circle" })" />
+    </div>
+    <div class="col-6 col-md-3">
+        <partial name="_StatCard" model="@(new StatCardViewModel { Label = "Заканчивается", Value = Model.LowStockCount.ToString(), Icon = "bi-exclamation-triangle" })" />
+    </div>
+    <div class="col-6 col-md-3">
+        <partial name="_StatCard" model="@(new StatCardViewModel { Label = "Отсутствует", Value = Model.OutOfStockCount.ToString(), Icon = "bi-x-circle" })" />
+    </div>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+    <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+        Title = "На складе пока нет товаров",
+        Description = "Добавьте товары через контент-менеджера или пополните остатки через заявки.",
+        Icon = "bi-box"
+    })" />
+}
+else
+{
+    <div class="table-responsive store-panel p-0 overflow-hidden">
+        <table class="table store-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Фото</th>
+                    <th>Товар</th>
+                    <th>Бренд</th>
+                    <th>Категория</th>
+                    <th>Остаток</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <img class="rounded border bg-light" src="@ImageUrlHelper.GetProductImageUrl(item.ImageUrl)" alt="@item.Name" style="width:48px;height:48px;object-fit:contain;" />
+                        </td>
+                        <td class="fw-semibold">@item.Name</td>
+                        <td>@item.Brand</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.StockQuantity</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge @StockStatusHelper.ToBadgeClass(item.StockQuantity)">@StockStatusHelper.ToDisplayName(item.StockQuantity)</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">В архиве</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

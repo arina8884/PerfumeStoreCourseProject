@@ -7,20 +7,20 @@ a.navbar-brand {
   word-break: break-all;
 }
 
-a {
-  color: #0077cc;
+a:not(.btn):not(.nav-link):not(.navbar-brand):not(.store-sidebar-link):not(.store-category-card):not(.store-brand-card):not(.text-dark) {
+  color: var(--store-charcoal, #2a2826);
 }
 
 .btn-primary {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--store-charcoal, #2a2826);
+  border-color: var(--store-charcoal, #2a2826);
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--store-charcoal, #2a2826);
+  border-color: var(--store-charcoal, #2a2826);
 }
 
 .border-top {

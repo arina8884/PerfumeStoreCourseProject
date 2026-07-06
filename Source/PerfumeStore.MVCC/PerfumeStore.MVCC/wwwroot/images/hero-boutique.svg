@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" fill="none" role="img" aria-label="@5<80;L=0O ?0@DN<5@8O">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf4ef"/>
+      <stop offset="100%" stop-color="#efe6df"/>
+    </linearGradient>
+    <linearGradient id="marble" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffdfb"/>
+      <stop offset="50%" stop-color="#f5ebe4"/>
+      <stop offset="100%" stop-color="#ebe0d8"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98"/>
+      <stop offset="100%" stop-color="#e8d5cf" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d9bfb3"/>
+      <stop offset="100%" stop-color="#9a7b6f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#fff8f4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#faf4ef" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" rx="32" fill="url(#wall)"/>
+  <rect width="900" height="600" rx="32" fill="url(#glow)"/>
+  <ellipse cx="200" cy="520" rx="320" ry="80" fill="#e8d5cf" opacity="0.35" filter="url(#blur)"/>
+  <rect x="0" y="420" width="900" height="180" fill="url(#marble)"/>
+  <line x1="0" y1="420" x2="900" y2="420" stroke="#d9c8bf" stroke-width="1" opacity="0.6"/>
+  <!-- soft window light -->
+  <rect x="620" y="40" width="200" height="280" rx="8" fill="#fff9f5" opacity="0.55"/>
+  <rect x="640" y="60" width="160" height="240" rx="4" fill="#ffffff" opacity="0.25"/>
+  <!-- roses -->
+  <g opacity="0.85">
+    <circle cx="120" cy="380" r="22" fill="#f0ddd6"/>
+    <circle cx="145" cy="365" r="16" fill="#e8cfc5"/>
+    <circle cx="98" cy="362" r="14" fill="#ead9cf"/>
+    <circle cx="130" cy="355" r="11" fill="#f5e8e2"/>
+    <ellipse cx="780" cy="350" rx="28" ry="18" fill="#f0ddd6" transform="rotate(-15 780 350)"/>
+    <ellipse cx="805" cy="365" rx="20" ry="14" fill="#e8cfc5" transform="rotate(10 805 365)"/>
+  </g>
+  <!-- centerpiece bottles -->
+  <g>
+    <rect x="280" y="200" width="100" height="220" rx="20" fill="url(#glass)" stroke="#d4c4bb" stroke-width="2"/>
+    <rect x="312" y="172" width="36" height="36" rx="8" fill="#2c2a28" opacity="0.88"/>
+    <rect x="298" y="290" width="64" height="95" rx="14" fill="url(#liquid)" opacity="0.82"/>
+    <rect x="420" y="160" width="120" height="260" rx="24" fill="url(#glass)" stroke="#d4c4bb" stroke-width="2"/>
+    <rect x="462" y="128" width="36" height="40" rx="8" fill="#2c2a28" opacity="0.88"/>
+    <rect x="438" y="255" width="84" height="125" rx="16" fill="url(#liquid)" opacity="0.88"/>
+    <rect x="580" y="215" width="88" height="205" rx="18" fill="url(#glass)" stroke="#d4c4bb" stroke-width="2"/>
+    <rect x="606" y="190" width="36" height="32" rx="8" fill="#2c2a28" opacity="0.88"/>
+    <rect x="594" y="295" width="60" height="88" rx="12" fill="url(#liquid)" opacity="0.78"/>
+  </g>
+  <!-- reflection -->
+  <ellipse cx="450" cy="455" rx="200" ry="12" fill="#2c2a28" opacity="0.06"/>
+  <text x="48" y="72" fill="#3d3935" font-family="Georgia, serif" font-size="22" letter-spacing="0.12em" opacity="0.55">PERFUMESTORE</text>
+</svg>

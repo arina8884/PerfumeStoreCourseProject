@@ -1,0 +1,53 @@
+@model CompareViewModel
+
+@{
+    ViewData["Title"] = "Сравнение товаров";
+    ViewData["MetaDescription"] = "Сравнение ароматов в PerfumeStore — характеристики, цены и наличие рядом.";
+}
+
+<partial name="_Breadcrumb" model="@(new[] {
+    ("Главная", Url.Action("Index", "Home"), false),
+    ("Сравнение", null, true)
+})" />
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel {
+        Title = "Сравнение товаров",
+        Subtitle = "Выберите до двух товаров для сравнения характеристик",
+        Icon = "bi-sliders"
+    })" />
+    @if (Model.Products.Count > 0)
+    {
+        <form asp-action="Clear" method="post" class="align-self-start">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-outline-dark" type="submit"><i class="bi bi-x-lg me-1"></i>Очистить</button>
+        </form>
+    }
+</div>
+
+@if (Model.Products.Count == 0)
+{
+    <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+        Title = "Список сравнения пуст",
+        Description = "Добавьте товары из каталога или карточки товара",
+        Icon = "bi-sliders",
+        ButtonText = "Перейти в каталог",
+        ButtonController = "Catalog",
+        ButtonAction = "Index"
+    })" />
+}
+else
+{
+    if (Model.Products.Count == 1)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+            Title = "Добавьте ещё один товар",
+            Description = "Для полноценного сравнения выберите второй аромат в каталоге",
+            Icon = "bi-sliders",
+            ButtonText = "Перейти в каталог",
+            ButtonController = "Catalog",
+            ButtonAction = "Index"
+        })" />
+    }
+    @await Html.PartialAsync("_CompareTable", Model)
+}

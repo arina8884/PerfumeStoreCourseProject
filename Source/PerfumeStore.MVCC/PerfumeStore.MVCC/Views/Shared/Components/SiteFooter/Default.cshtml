@@ -1,0 +1,63 @@
+@model SiteFooterViewModel
+
+<footer class="store-footer mt-auto">
+    <div class="container py-4 py-lg-5">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+                <img src="~/images/logo.svg" alt="PerfumeStore" class="store-brand-logo mb-3" width="148" height="32" />
+                <p class="store-footer-tagline mb-3">Парфюмерия в Минске с 2019 года — шоурум и доставка по Беларуси</p>
+                <div class="d-flex flex-column gap-1 small">
+                    <a class="text-decoration-none text-muted" href="tel:+375290000000">+375 (29) 000-00-00</a>
+                    <a class="text-decoration-none text-muted" href="mailto:info@perfume.by">info@perfume.by</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="store-footer-title">Магазин</div>
+                <nav class="store-footer-nav">
+                    <a asp-controller="Catalog" asp-action="Index">Каталог</a>
+                    @if (User.IsInRole(UserRoles.Client))
+                    {
+                        <a asp-controller="ClientProfile" asp-action="Dashboard">Кабинет</a>
+                    }
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="about">О магазине</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="contacts">Контакты</a>
+                </nav>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="store-footer-title">Покупателям</div>
+                <nav class="store-footer-nav">
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="delivery-info">Доставка</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="payment-info">Оплата</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="return-info">Возврат</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="faq-info">Вопросы</a>
+                </nav>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="store-footer-title">Категории</div>
+                @if (Model.Categories.Count == 0)
+                {
+                    <nav class="store-footer-nav">
+                        <a asp-controller="Catalog" asp-action="Index">Весь каталог</a>
+                    </nav>
+                }
+                else
+                {
+                    <nav class="store-footer-nav store-footer-nav-grid">
+                        @foreach (var category in Model.Categories.Take(6))
+                        {
+                            <a asp-controller="Catalog" asp-action="ByCategory" asp-route-id="@category.Id">@category.Name</a>
+                        }
+                    </nav>
+                }
+            </div>
+        </div>
+        <div class="store-footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <span>PerfumeStore · Минск</span>
+            <div class="store-social-links d-flex gap-2">
+                <a href="https://instagram.com" class="store-social-link" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>
+                <a href="https://t.me" class="store-social-link" title="Telegram" target="_blank" rel="noopener noreferrer"><i class="bi bi-telegram"></i></a>
+                <a href="https://vk.com" class="store-social-link" title="VK" target="_blank" rel="noopener noreferrer"><i class="bi bi-vk"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>

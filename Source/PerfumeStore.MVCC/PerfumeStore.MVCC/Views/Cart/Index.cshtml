@@ -2,21 +2,35 @@
 
 @{
     ViewData["Title"] = "Корзина";
+    ViewData["MetaDescription"] = "Корзина PerfumeStore — просмотр выбранных ароматов и переход к оформлению заказа.";
+    ViewData["CheckoutStep"] = 1;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="mb-1">Корзина</h1>
-        <p class="text-muted mb-0">Товары, выбранные для оформления заказа.</p>
-    </div>
-    <a class="btn btn-outline-dark" asp-controller="Catalog" asp-action="Index">Продолжить покупки</a>
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Корзина",
+    Subtitle = "Товары, выбранные для оформления заказа",
+    Icon = "bi-cart3"
+})" />
+
+@if (!Model.IsEmpty)
+{
+    <partial name="_CheckoutSteps" />
+}
+
+<div class="d-flex flex-wrap justify-content-end mb-3">
+    <a class="btn btn-outline-dark" asp-controller="Catalog" asp-action="Index"><i class="bi bi-arrow-left me-1"></i>Продолжить покупки</a>
 </div>
 
 @if (Model.IsEmpty)
 {
-    <div class="alert alert-light border">
-        Корзина пуста. Перейдите в каталог, чтобы выбрать товары.
-    </div>
+    <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+        Title = "Корзина пуста",
+        Description = "Добавьте товары из каталога, чтобы оформить заказ",
+        Icon = "bi-cart",
+        ButtonText = "Перейти в каталог",
+        ButtonController = "Catalog",
+        ButtonAction = "Index"
+    })" />
 }
 else
 {
@@ -24,25 +38,24 @@ else
         <section class="col-lg-8">
             @foreach (var item in Model.Items)
             {
-                <div class="card mb-3">
+                <div class="store-panel mb-3 p-0 overflow-hidden">
                     <div class="row g-0">
-                        <div class="col-md-3 bg-light d-flex align-items-center justify-content-center">
-                            <img class="img-fluid p-3" src="@(item.ImageUrl ?? "/images/products/no-image.png")" alt="@item.ProductName" />
+                        <div class="col-md-3 bg-light d-flex align-items-center justify-content-center p-3">
+                            <img class="img-fluid" style="max-height: 140px; object-fit: contain;" src="@ImageUrlHelper.GetProductImageUrl(item.ImageUrl)" alt="@item.ProductName" />
                         </div>
                         <div class="col-md-9">
-                            <div class="card-body">
+                            <div class="p-3">
                                 <div class="d-flex justify-content-between gap-3">
                                     <div>
                                         <div class="text-muted small">@item.Brand</div>
                                         <h2 class="h5 mb-1">
-                                            <a class="text-dark text-decoration-none" href="/product/@item.ProductId">@item.ProductName</a>
+                                            <a class="text-dark text-decoration-none" asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId">@item.ProductName</a>
                                         </h2>
-                                        <p class="mb-1">Объем: @item.Volume мл</p>
-                                        <p class="mb-1">Цена: @item.Price.ToString("N2")</p>
-                                        <p class="text-muted mb-0">Доступно: @item.StockQuantity</p>
+                                        <p class="mb-1 text-muted small">Объём: @item.Volume мл · Доступно: @item.StockQuantity шт.</p>
+                                        <p class="mb-0">Цена: <span class="fw-semibold">@item.Price.ToString("N2") BYN</span></p>
                                     </div>
                                     <div class="text-end">
-                                        <div class="fw-bold">@item.TotalPrice.ToString("N2")</div>
+                                        <div class="fw-bold fs-5">@item.TotalPrice.ToString("N2") BYN</div>
                                     </div>
                                 </div>
 
@@ -50,14 +63,13 @@ else
                                     <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="d-flex gap-2 align-items-center">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="cartItemId" value="@item.Id" />
-                                        <input class="form-control" type="number" name="quantity" value="@item.Quantity" min="1" max="@item.StockQuantity" style="width: 90px;" />
-                                        <button class="btn btn-outline-dark" type="submit">Обновить</button>
+                                        <input class="form-control form-control-sm" type="number" name="quantity" value="@item.Quantity" min="1" max="@item.StockQuantity" style="width: 80px;" />
+                                        <button class="btn btn-sm btn-outline-dark" type="submit"><i class="bi bi-arrow-repeat me-1"></i>Обновить</button>
                                     </form>
-
                                     <form asp-controller="Cart" asp-action="Remove" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="cartItemId" value="@item.Id" />
-                                        <button class="btn btn-outline-danger" type="submit">Удалить</button>
+                                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i>Удалить</button>
                                     </form>
                                 </div>
                             </div>
@@ -68,22 +80,20 @@ else
         </section>
 
         <aside class="col-lg-4">
-            <div class="border rounded-3 p-4">
-                <h2 class="h5">Итого</h2>
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Товаров</span>
+            <div class="store-panel">
+                <div class="store-panel-title mb-3"><i class="bi bi-receipt me-2"></i>Итого</div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Товаров</span>
                     <span>@Model.Items.Sum(item => item.Quantity)</span>
                 </div>
                 <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
                     <span>Сумма</span>
-                    <span>@Model.TotalAmount.ToString("N2")</span>
+                    <span>@Model.TotalAmount.ToString("N2") BYN</span>
                 </div>
-
-                <a class="btn btn-dark w-100 mb-2" asp-controller="Checkout" asp-action="Index">Оформить заказ</a>
-
+                <a class="btn btn-dark w-100 mb-2" asp-controller="Checkout" asp-action="Index"><i class="bi bi-bag-check me-1"></i>Оформить заказ</a>
                 <form asp-controller="Cart" asp-action="Clear" method="post">
                     @Html.AntiForgeryToken()
-                    <button class="btn btn-outline-danger w-100" type="submit">Очистить корзину</button>
+                    <button class="btn btn-outline-danger w-100" type="submit"><i class="bi bi-x-circle me-1"></i>Очистить корзину</button>
                 </form>
             </div>
         </aside>

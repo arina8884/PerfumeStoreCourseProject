@@ -1,0 +1,98 @@
+@model ProductPreviewViewModel
+
+
+
+@{
+
+    ViewData["Title"] = $"Товар: {Model.Name}";
+
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = Model.Name,
+
+    Subtitle = "Предпросмотр карточки товара перед публикацией",
+
+    Icon = "bi-eye"
+
+})" />
+
+
+
+<div class="row g-4">
+
+    <div class="col-md-4">
+
+        <div class="store-panel p-3 text-center">
+
+            <img class="img-fluid" src="@ImageUrlHelper.GetProductImageUrl(Model.ImageUrl)" alt="@Model.Name" style="max-height: 320px; object-fit: contain;" />
+
+        </div>
+
+    </div>
+
+    <div class="col-md-8">
+
+        <div class="store-panel">
+
+            <div class="store-panel-title mb-3"><i class="bi bi-info-circle me-2"></i>Характеристики</div>
+
+            <dl class="row mb-0">
+
+                <dt class="col-sm-4">Бренд</dt>
+
+                <dd class="col-sm-8">@Model.Brand</dd>
+
+                <dt class="col-sm-4">Категория</dt>
+
+                <dd class="col-sm-8">@Model.CategoryName</dd>
+
+                <dt class="col-sm-4">Цена</dt>
+
+                <dd class="col-sm-8">@Model.Price.ToString("N2") BYN</dd>
+
+                <dt class="col-sm-4">Объём</dt>
+
+                <dd class="col-sm-8">@Model.Volume мл</dd>
+
+                <dt class="col-sm-4">Статус</dt>
+
+                <dd class="col-sm-8">@(Model.IsActive ? "Активен" : "В архиве")</dd>
+
+            </dl>
+
+        </div>
+
+
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+
+        {
+
+            <div class="store-panel mt-4">
+
+                <div class="store-panel-title mb-3"><i class="bi bi-card-text me-2"></i>Описание</div>
+
+                <p class="mb-0 text-muted">@Model.Description</p>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+
+
+<div class="d-flex flex-wrap gap-2 mt-4">
+
+    <a class="btn btn-dark" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil me-1"></i>Изменить</a>
+
+    <a class="btn btn-outline-dark" asp-action="Index"><i class="bi bi-arrow-left me-1"></i>К списку</a>
+
+</div>
+

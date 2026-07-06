@@ -1,0 +1,18 @@
+@model CategoryEditViewModel
+
+@{
+    ViewData["Title"] = "Новая категория";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Новая категория",
+    Subtitle = "Создайте раздел каталога для группировки ароматов",
+    Icon = "bi-folder-plus"
+})" />
+
+<form asp-action="Create" method="post" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+    <partial name="_CategoryEditForm" model="Model" />
+    @{ ViewData["CancelUrl"] = Url.Action("Index"); ViewData["SubmitText"] = "Создать"; }
+    <partial name="_FormActions" />
+</form>

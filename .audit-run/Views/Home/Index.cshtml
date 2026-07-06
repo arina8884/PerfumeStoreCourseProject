@@ -1,0 +1,246 @@
+﻿@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Главная";
+    ViewData["MetaDescription"] = "PerfumeStore — интернет-магазин оригинальной парфюмерии в Беларуси. Новинки, популярные ароматы, бренды, отзывы и доставка.";
+}
+
+<section class="store-hero store-hero-banner rounded-4 mb-5">
+    <div class="row align-items-center g-4 h-100">
+        <div class="col-lg-6">
+            <p class="text-uppercase small fw-semibold text-muted mb-2">PerfumeStore · Беларусь</p>
+            <h1 class="display-4 fw-bold mb-3">Откройте мир изысканных ароматов</h1>
+            <p class="lead text-muted mb-4">Оригинальная парфюмерия ведущих брендов — от цветочных до восточных композиций. Выберите объём, сравните ароматы и оформите заказ онлайн.</p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a class="btn btn-dark btn-lg" asp-controller="Catalog" asp-action="Index"><i class="bi bi-grid me-1"></i>Перейти в каталог</a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a class="btn btn-outline-dark btn-lg" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus me-1"></i>Создать аккаунт</a>
+                }
+                else if (User.IsInRole(UserRoles.Client))
+                {
+                    <a class="btn btn-outline-dark btn-lg" asp-controller="ClientProfile" asp-action="Dashboard"><i class="bi bi-person-circle me-1"></i>Личный кабинет</a>
+                }
+            </div>
+            <div class="row g-2 hero-advantages-row">
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-shield-check me-1"></i>Оригинальная продукция</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-truck me-1"></i>Доставка по Беларуси</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-credit-card me-1"></i>Удобная оплата</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-chat-heart me-1"></i>Отзывы покупателей</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <div class="store-hero-visual p-3 p-lg-4">
+                <img class="img-fluid store-hero-banner-image" src="~/images/hero-banner.svg" alt="PerfumeStore — парфюмерия" />
+                <p class="mb-0 mt-3 text-muted fw-semibold">Парфюмерия для каждого настроения</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Новинки", Subtitle = "Недавно добавленные ароматы в каталоге.", Icon = "bi-stars" })" />
+    @if (Model.NewProducts.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Новинок пока нет", Description = "Скоро здесь появятся новые ароматы.", Icon = "bi-stars", ButtonText = "Перейти в каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.NewProducts)
+            {
+                <div class="col-6 col-lg-3 d-flex">
+                    <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", User.IsInRole(UserRoles.Client) } }' />
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="mb-5">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Популярные товары", Subtitle = "Ароматы, которые чаще всего выбирают покупатели.", Icon = "bi-fire" })" />
+    @if (Model.PopularProducts.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Популярных товаров пока нет", Description = "Каталог скоро пополнится.", Icon = "bi-box", ButtonText = "Перейти в каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.PopularProducts)
+            {
+                <div class="col-6 col-lg-3 d-flex">
+                    <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", User.IsInRole(UserRoles.Client) } }' />
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="mb-5">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Категории", Subtitle = "Найдите аромат по направлению.", Icon = "bi-grid" })" />
+    @if (Model.Categories.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Категории пока не добавлены", Description = "Разделы каталога появятся после наполнения магазина.", Icon = "bi-grid" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a class="store-category-card" asp-controller="Catalog" asp-action="ByCategory" asp-route-id="@category.Id">
+                        <i class="bi bi-grid mb-2"></i>
+                        <span class="fw-semibold">@category.Name</span>
+                        @if (!string.IsNullOrWhiteSpace(category.Description))
+                        {
+                            <span class="small text-muted d-block mt-1">@category.Description</span>
+                        }
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="mb-5">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Популярные бренды", Subtitle = "Коллекции ведущих парфюмерных домов.", Icon = "bi-award" })" />
+    @if (Model.Brands.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Бренды пока не добавлены", Description = "Список брендов появится вместе с товарами каталога.", Icon = "bi-award", ButtonText = "Перейти в каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var brand in Model.Brands)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a class="store-brand-card" asp-controller="Catalog" asp-action="Index" asp-route-Brand="@brand">
+                        <i class="bi bi-award"></i>
+                        <span class="fw-semibold">@brand</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="mb-5">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Отзывы покупателей", Subtitle = "Мнения клиентов о понравившихся ароматах.", Icon = "bi-chat-square-quote" })" />
+    @if (Model.RecentReviews.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Отзывов пока нет", Description = "Станьте первым, кто поделится впечатлением после покупки.", Icon = "bi-chat", ButtonText = "Перейти в каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var review in Model.RecentReviews)
+            {
+                <div class="col-md-6">
+                    <div class="review-card h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="review-avatar"><i class="bi bi-person"></i></div>
+                                <strong>@review.UserFullName</strong>
+                            </div>
+                            <span class="badge text-bg-dark"><i class="bi bi-star-fill me-1"></i>@review.Rating / 5</span>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@review.ProductId">@review.ProductName</a>
+                            · @review.ReviewDate.ToString("d")
+                        </div>
+                        <p class="mb-0">@(review.Comment ?? "Без комментария")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="store-newsletter-section mb-5" id="newsletter">
+    <div class="store-newsletter-inner">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+                <div class="store-panel-title mb-2"><i class="bi bi-envelope-heart me-2"></i>Подписка на новости</div>
+                <p class="text-muted mb-0">Узнавайте первыми о новинках, акциях и поступлениях редких ароматов.</p>
+            </div>
+            <div class="col-lg-7">
+                <div class="store-panel">
+                    <label class="form-label fw-semibold" for="newsletter-email">Ваш email</label>
+                    <div class="input-group input-group-lg">
+                        <input type="email" class="form-control" id="newsletter-email" placeholder="example@mail.by" aria-label="Email для подписки" disabled />
+                        <button class="btn btn-dark" type="button" disabled title="Будет доступно на следующем этапе">Подписаться</button>
+                    </div>
+                    <p class="small text-muted mt-3 mb-0">Функция подписки будет активирована после запуска магазина.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="store-panel mb-4" id="about">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "О магазине", Subtitle = "PerfumeStore — интернет-магазин парфюмерии в Беларуси.", Icon = "bi-shop" })" />
+    <p class="text-muted mb-0">Мы собираем коллекцию ароматов для повседневного использования и особых случаев. В каталоге представлены товары разных объёмов, а личный кабинет помогает отслеживать заказы, избранное и сравнение ароматов.</p>
+</section>
+
+<section class="store-panel mb-4" id="contacts">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Контакты", Subtitle = "Свяжитесь с нами удобным способом.", Icon = "bi-telephone" })" />
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="small text-muted">Телефон</div>
+                <a class="fw-semibold text-dark text-decoration-none" href="tel:+375290000000">+375 (29) 000-00-00</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="small text-muted">Email</div>
+                <a class="fw-semibold text-dark text-decoration-none" href="mailto:info@perfume.by">info@perfume.by</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="small text-muted">Адрес</div>
+                <div class="fw-semibold">г. Минск, пр-т Независимости, 1</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="store-panel mb-4" id="delivery-info">
+    <div class="store-panel-title"><i class="bi bi-truck me-2"></i>Доставка</div>
+    <p class="text-muted mb-0">Доставка осуществляется по Минску и другим городам Беларуси. Способ и сроки выбираются при оформлении заказа.</p>
+</section>
+
+<section class="store-panel mb-4" id="payment-info">
+    <div class="store-panel-title"><i class="bi bi-credit-card me-2"></i>Оплата</div>
+    <p class="text-muted mb-0">Доступны наличный и безналичный расчёт. Способ оплаты выбирается на этапе оформления заказа.</p>
+</section>
+
+<section class="store-panel mb-4" id="return-info">
+    <div class="store-panel-title"><i class="bi bi-arrow-repeat me-2"></i>Возврат</div>
+    <p class="text-muted mb-0">Возврат товара возможен в соответствии с законодательством Республики Беларусь при сохранении товарного вида и упаковки.</p>
+</section>
+
+<section class="store-panel mb-4" id="faq-info">
+    <div class="store-panel-title"><i class="bi bi-question-circle me-2"></i>Частые вопросы</div>
+    <p class="text-muted mb-2"><strong>Как оформить заказ?</strong> Добавьте товары в корзину, войдите в аккаунт и пройдите шаги оформления.</p>
+    <p class="text-muted mb-0"><strong>Как отследить заказ?</strong> Статус доступен в личном кабинете в разделе «Мои заказы».</p>
+</section>
+
+<section class="store-panel mb-4" id="privacy-info">
+    <div class="store-panel-title"><i class="bi bi-shield-lock me-2"></i>Политика конфиденциальности</div>
+    <p class="text-muted mb-0">Мы обрабатываем персональные данные только для оформления заказов и обслуживания клиентов.</p>
+</section>
+
+<section class="store-panel mb-2" id="terms-info">
+    <div class="store-panel-title"><i class="bi bi-file-text me-2"></i>Пользовательское соглашение</div>
+    <p class="text-muted mb-0">Используя сайт PerfumeStore, вы соглашаетесь с правилами оформления заказов, оплаты и доставки.</p>
+</section>

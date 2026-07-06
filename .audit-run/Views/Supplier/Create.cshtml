@@ -1,0 +1,22 @@
+@model SupplierEditViewModel
+
+@{
+    ViewData["Title"] = "Новый поставщик";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Новый поставщик",
+    Subtitle = "Добавьте контактные данные партнёра для закупок.",
+    Icon = "bi-truck"
+})" />
+
+<form asp-action="Create" method="post" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+    <partial name="_SupplierEditForm" model="Model" />
+    @{ ViewData["SubmitText"] = "Создать"; ViewData["CancelUrl"] = Url.Action("Index"); }
+    <partial name="_FormActions" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

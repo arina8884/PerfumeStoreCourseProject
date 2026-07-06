@@ -1,0 +1,25 @@
+@model OrderCancelViewModel
+
+@{
+    ViewData["Title"] = $"Отмена заказа #{Model.OrderId}";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = $"Отмена заказа №{Model.OrderId}",
+    Subtitle = "Подтвердите отмену — остатки товаров будут возвращены на склад.",
+    Icon = "bi-x-circle"
+})" />
+
+<div class="alert alert-warning border-0">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Вы уверены, что хотите отменить заказ клиента <strong>@Model.ClientFullName</strong>
+    на сумму <strong>@Model.TotalAmount.ToString("N2") BYN</strong>?
+</div>
+
+<p class="mb-4">Текущий статус: <partial name="_OrderStatusBadge" model="@Model.Status" /></p>
+
+<form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" class="d-flex flex-wrap gap-2">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-danger" type="submit"><i class="bi bi-x-lg me-1"></i>Подтвердить отмену</button>
+    <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@Model.OrderId">Назад</a>
+</form>

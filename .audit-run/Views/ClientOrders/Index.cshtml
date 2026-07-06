@@ -1,0 +1,55 @@
+@model ClientOrderListViewModel
+
+@{
+    ViewData["Title"] = "История заказов";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "История заказов",
+    Subtitle = "Все ваши покупки и их текущий статус.",
+    Icon = "bi-bag-check"
+})" />
+
+@if (Model.Orders.Count == 0)
+{
+    <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+        Title = "Заказов пока нет",
+        Description = "Оформите первый заказ в каталоге — он появится здесь.",
+        Icon = "bi-bag",
+        ButtonText = "Перейти в каталог",
+        ButtonController = "Catalog",
+        ButtonAction = "Index"
+    })" />
+}
+else
+{
+    <div class="table-responsive store-panel p-0 overflow-hidden">
+        <table class="table store-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td><span class="fw-semibold">#@order.OrderId</span></td>
+                        <td>@order.OrderDate.ToString("g")</td>
+                        <td>@order.TotalAmount.ToString("N2") BYN</td>
+                        <td><partial name="_OrderStatusBadge" model="@order.Status" /></td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-dark" asp-action="Details" asp-route-id="@order.OrderId">
+                                <i class="bi bi-eye me-1"></i>Подробнее
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

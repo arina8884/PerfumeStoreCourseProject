@@ -1,0 +1,22 @@
+@model ProductEditViewModel
+
+@{
+    ViewData["Title"] = "Новый товар";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Новый товар",
+    Subtitle = "Заполните карточку товара для публикации в каталоге.",
+    Icon = "bi-plus-lg"
+})" />
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+    <partial name="_ProductContentEditForm" model="Model" />
+    @{ ViewData["CancelUrl"] = Url.Action("Index"); ViewData["SubmitText"] = "Создать"; }
+    <partial name="_FormActions" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

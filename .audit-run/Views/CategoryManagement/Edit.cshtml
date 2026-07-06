@@ -1,0 +1,22 @@
+@model CategoryEditViewModel
+
+@{
+    ViewData["Title"] = "Редактирование категории";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Редактирование категории",
+    Subtitle = "Измените название и описание раздела каталога.",
+    Icon = "bi-folder"
+})" />
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+    <partial name="_CategoryEditForm" model="Model" />
+    @{ ViewData["SubmitText"] = "Сохранить"; ViewData["CancelUrl"] = Url.Action("Index"); }
+    <partial name="_FormActions" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

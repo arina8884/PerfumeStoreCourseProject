@@ -1,0 +1,26 @@
+@model ManagerOrderHistoryViewModel
+
+
+
+@{
+
+    ViewData["Title"] = "История заказов";
+
+}
+
+
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+
+    Title = "История заказов",
+
+    Subtitle = "Завершённые и отменённые заказы",
+
+    Icon = "bi-clock-history"
+
+})" />
+
+
+
+<partial name="_ManagerOrderTable" model="Model.Orders" />
+

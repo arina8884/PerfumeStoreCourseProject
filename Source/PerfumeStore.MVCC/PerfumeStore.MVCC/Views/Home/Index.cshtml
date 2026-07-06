@@ -2,74 +2,226 @@
 
 @{
     ViewData["Title"] = "Главная";
+    ViewData["MetaDescription"] = "PerfumeStore — парфюмерия в Минске, доставка по Беларуси";
 }
 
-<section class="bg-light border rounded-3 p-5 mb-5">
-    <div class="row align-items-center">
-        <div class="col-lg-8">
-            <h1 class="display-5 fw-bold">Интернет-магазин парфюмерии</h1>
-            <p class="lead mb-4">Откройте каталог ароматов, найдите любимый бренд и выберите подходящий объем.</p>
-            <a class="btn btn-dark btn-lg" asp-controller="Catalog" asp-action="Index">Перейти в каталог</a>
+<section class="store-hero-luxury mb-5">
+    <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-lg-5 position-relative">
+            <span class="store-hero-eyebrow">Минск · доставка по Беларуси</span>
+            <h1 class="store-hero-title">Парфюмерия, которую хочется носить каждый день</h1>
+            <p class="store-hero-lead">Dior, Chanel, Creed и другие дома — в одном каталоге. Выберите объём, сравните ароматы и оформите заказ за пару минут</p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a class="btn btn-dark btn-lg" asp-controller="Catalog" asp-action="Index"><i class="bi bi-grid me-1"></i>Открыть каталог</a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a class="btn btn-outline-dark btn-lg" asp-controller="Account" asp-action="Register">Создать аккаунт</a>
+                }
+                else if (User.IsInRole(UserRoles.Client))
+                {
+                    <a class="btn btn-outline-dark btn-lg" asp-controller="ClientProfile" asp-action="Dashboard">Личный кабинет</a>
+                }
+            </div>
+            <div class="row g-2 hero-advantages-row">
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-shield-check me-1"></i>Оригинальная продукция</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-truck me-1"></i>Курьер и почта</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-credit-card me-1"></i>Карта и наличные</div>
+                </div>
+                <div class="col-6">
+                    <div class="hero-advantage-chip"><i class="bi bi-chat-heart me-1"></i>Отзывы покупателей</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="store-hero-visual-wrap">
+                <img class="store-hero-banner-image"
+                     src="~/images/hero/hero-main.webp"
+                     asp-append-version="true"
+                     alt="Элегантная парфюмерная композиция — баннер PerfumeStore"
+                     onerror="this.onerror=null;this.src='/images/hero/hero-placeholder.svg';" />
+            </div>
         </div>
     </div>
 </section>
 
-<section class="mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Категории</h2>
-        <a asp-controller="Catalog" asp-action="Index">Все товары</a>
-    </div>
+<section class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Новинки", Subtitle = "Свежие поступления в каталоге", Icon = "bi-stars" })" />
+    @if (Model.NewProducts.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Пока пусто", Description = "Скоро добавим новые позиции — загляните в каталог", Icon = "bi-stars", ButtonText = "Каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.NewProducts)
+            {
+                <div class="col-6 col-lg-3 d-flex">
+                    <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", User.IsInRole(UserRoles.Client) } }' />
+                </div>
+            }
+        </div>
+    }
+</section>
 
+<section class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Популярное", Subtitle = "Чаще всего выбирают покупатели", Icon = "bi-graph-up-arrow" })" />
+    @if (Model.PopularProducts.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Пока пусто", Description = "Каталог пополняется — загляните чуть позже", Icon = "bi-box", ButtonText = "Каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.PopularProducts)
+            {
+                <div class="col-6 col-lg-3 d-flex">
+                    <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", User.IsInRole(UserRoles.Client) } }' />
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Категории", Subtitle = "По настроению и характеру аромата", Icon = "bi-grid" })" />
+    @if (Model.Categories.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Категории скоро", Icon = "bi-grid" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a class="store-category-card" asp-controller="Catalog" asp-action="ByCategory" asp-route-id="@category.Id">
+                        <i class="bi bi-flower1"></i>
+                        <span class="fw-semibold">@category.Name</span>
+                        @if (!string.IsNullOrWhiteSpace(category.Description))
+                        {
+                            <span class="small text-muted">@(category.Description?.TrimEnd('.', ' '))</span>
+                        }
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Бренды", Subtitle = "От масс-маркета до ниши", Icon = "bi-gem" })" />
+    @if (Model.Brands.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Бренды скоро", Icon = "bi-gem", ButtonText = "Каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var brand in Model.Brands)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a class="store-brand-card" asp-controller="Catalog" asp-action="Index" asp-route-Brand="@brand">
+                        <i class="bi bi-gem"></i>
+                        <span class="fw-semibold">@brand</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Отзывы", Subtitle = "Впечатления покупателей", Icon = "bi-chat-square-quote" })" />
+    @if (Model.RecentReviews.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel { Title = "Отзывов пока нет", Icon = "bi-chat", ButtonText = "Каталог", ButtonController = "Catalog", ButtonAction = "Index" })" />
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var review in Model.RecentReviews)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="review-card h-100">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <strong>@review.UserFullName</strong>
+                            </div>
+                            <span class="badge text-bg-dark"><i class="bi bi-star-fill me-1"></i>@review.Rating</span>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@review.ProductId">@review.ProductName</a>
+                            · @review.ReviewDate.ToString("d")
+                        </div>
+                        <p class="mb-0">@(review.Comment ?? "—")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section id="about" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "О магазине", Subtitle = "Небольшой магазин в центре Минска", Icon = "bi-shop" })" />
+    <p class="text-muted mb-0">Мы работаем с 2019 года: сначала был шоурум на Немиге, теперь — онлайн-каталог с доставкой по всей стране. В ассортименте — только оригинальная парфюмерия, без серых поставок. Если сомневаетесь с выбором — напишите, подскажем по стойкости и сезону</p>
+</section>
+
+<section id="contacts" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Контакты", Subtitle = "Ответим в рабочие часы", Icon = "bi-telephone" })" />
     <div class="row g-3">
-        @foreach (var category in Model.Categories)
-        {
-            <div class="col-6 col-md-4 col-lg-3">
-                <a class="btn btn-outline-dark w-100" href="/catalog/category/@category.Id">
-                    @category.Name
-                </a>
+        <div class="col-md-6">
+            <div class="store-panel h-100">
+                <div class="fw-semibold mb-1">Телефон</div>
+                <a class="text-dark text-decoration-none" href="tel:+375290000000">+375 (29) 000-00-00</a>
             </div>
-        }
+        </div>
+        <div class="col-md-6">
+            <div class="store-panel h-100">
+                <div class="fw-semibold mb-1">Почта</div>
+                <a class="text-dark text-decoration-none" href="mailto:info@perfume.by">info@perfume.by</a>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="store-panel">
+                <div class="fw-semibold mb-1">Адрес шоурума</div>
+                <div>г. Минск, пр-т Независимости, 1 — самовывоз по предварительной записи</div>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="mb-5">
-    <h2 class="h4 mb-3">Популярные товары</h2>
-    <div class="row g-4">
-        @foreach (var product in Model.PopularProducts)
-        {
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100">
-                    <img class="card-img-top bg-light" src="@(product.ImageUrl ?? "/images/products/no-image.png")" alt="@product.Name" />
-                    <div class="card-body">
-                        <div class="text-muted small">@product.Brand</div>
-                        <h3 class="h6">@product.Name</h3>
-                        <p class="mb-1">@product.Volume мл</p>
-                        <p class="fw-bold">@product.Price.ToString("N2")</p>
-                        <a class="btn btn-outline-dark w-100" href="/product/@product.Id">Подробнее</a>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+<section id="delivery-info" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Доставка", Subtitle = "Минск и другие города", Icon = "bi-truck" })" />
+    <p class="text-muted mb-0">Курьер по Минску — обычно на следующий день после подтверждения. В регионы отправляем Белпочтой или Европочтой, срок зависит от населённого пункта. Точную стоимость увидите при оформлении — она считается от веса и адреса</p>
 </section>
 
-<section>
-    <h2 class="h4 mb-3">Новые товары</h2>
-    <div class="row g-4">
-        @foreach (var product in Model.NewProducts)
-        {
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100">
-                    <img class="card-img-top bg-light" src="@(product.ImageUrl ?? "/images/products/no-image.png")" alt="@product.Name" />
-                    <div class="card-body">
-                        <div class="text-muted small">@product.Brand</div>
-                        <h3 class="h6">@product.Name</h3>
-                        <p class="mb-1">@product.CategoryName</p>
-                        <p class="fw-bold">@product.Price.ToString("N2")</p>
-                        <a class="btn btn-outline-dark w-100" href="/product/@product.Id">Подробнее</a>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+<section id="payment-info" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Оплата", Subtitle = "Как удобнее вам", Icon = "bi-credit-card" })" />
+    <p class="text-muted mb-0">Принимаем банковские карты онлайн и наличные при получении. Для юрлиц — безналичный расчёт по счёту, напишите на info@perfume.by</p>
+</section>
+
+<section id="return-info" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Возврат", Subtitle = "Если аромат не подошёл", Icon = "bi-arrow-counterclockwise" })" />
+    <p class="text-muted mb-0">Невскрытая упаковка можно вернуть в течение 14 дней — по правилам Закона о защите прав потребителей РБ. Распылённый или вскрытый флакон принять не сможем: это требование производителя</p>
+</section>
+
+<section id="faq-info" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Вопросы", Subtitle = "Частые случаи", Icon = "bi-question-circle" })" />
+    <p class="text-muted mb-2"><strong>Как оформить заказ?</strong> Добавьте товары в корзину, укажите адрес и способ оплаты — письмо с номером придёт на почту</p>
+    <p class="text-muted mb-0"><strong>Где смотреть статус?</strong> В личном кабинете, раздел «Мои заказы» — там же трек-номер, когда отправим</p>
+</section>
+
+<section id="privacy-info" class="store-section">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Конфиденциальность", Subtitle = "Как храним данные", Icon = "bi-shield" })" />
+    <p class="text-muted mb-0">Имя, телефон и адрес нужны только для доставки и связи по заказу. Не передаём их третьим лицам, кроме служб доставки. Удалить аккаунт можно через поддержку</p>
+</section>
+
+<section id="terms-info" class="store-section mb-0">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel { Title = "Условия", Subtitle = "Правила покупки", Icon = "bi-file-text" })" />
+    <p class="text-muted mb-0">Оформляя заказ, вы соглашаетесь с ценами и сроками на момент оплаты. Мы оставляем за собой право уточнить наличие по телефону, если остаток на складе изменился</p>
 </section>

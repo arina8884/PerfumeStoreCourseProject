@@ -1,0 +1,22 @@
+@model UserManageViewModel
+
+@{
+    ViewData["Title"] = "Новый пользователь";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Новый пользователь",
+    Subtitle = "Создайте учётную запись сотрудника или клиента.",
+    Icon = "bi-person-plus"
+})" />
+
+<form asp-action="Create" method="post" class="store-panel store-form">
+    @Html.AntiForgeryToken()
+    <partial name="_UserManageForm" model="Model" />
+    @{ ViewData["SubmitText"] = "Создать"; ViewData["CancelUrl"] = Url.Action("Index"); }
+    <partial name="_FormActions" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

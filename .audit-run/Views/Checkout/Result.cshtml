@@ -1,0 +1,38 @@
+@model OrderResultViewModel
+
+@{
+    ViewData["Title"] = "Заказ оформлен";
+    ViewData["CheckoutStep"] = 5;
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Заказ успешно оформлен",
+    Subtitle = "Спасибо за покупку! Мы начали обработку вашего заказа.",
+    Icon = "bi-check-circle"
+})" />
+
+<partial name="_CheckoutSteps" />
+
+<div class="store-panel mb-4 mx-auto" style="max-width: 560px;">
+    <dl class="row mb-0">
+        <dt class="col-sm-5">Номер заказа</dt>
+        <dd class="col-sm-7 fw-semibold">#@Model.OrderId</dd>
+        <dt class="col-sm-5">Дата</dt>
+        <dd class="col-sm-7">@Model.OrderDate.ToString("g")</dd>
+        <dt class="col-sm-5">Сумма</dt>
+        <dd class="col-sm-7 fw-bold">@Model.TotalAmount.ToString("N2") BYN</dd>
+        <dt class="col-sm-5">Адрес доставки</dt>
+        <dd class="col-sm-7">@Model.DeliveryAddress</dd>
+        <dt class="col-sm-5">Способ доставки</dt>
+        <dd class="col-sm-7">@Model.DeliveryMethod</dd>
+        <dt class="col-sm-5">Способ оплаты</dt>
+        <dd class="col-sm-7">@Model.PaymentMethod</dd>
+        <dt class="col-sm-5">Статус</dt>
+        <dd class="col-sm-7"><partial name="_OrderStatusBadge" model="@Model.Status" /></dd>
+    </dl>
+</div>
+
+<div class="d-flex flex-wrap justify-content-center gap-2">
+    <a class="btn btn-dark" asp-controller="ClientOrders" asp-action="Details" asp-route-id="@Model.OrderId"><i class="bi bi-receipt me-1"></i>Детали заказа</a>
+    <a class="btn btn-outline-dark" asp-controller="Catalog" asp-action="Index"><i class="bi bi-shop me-1"></i>Вернуться в каталог</a>
+</div>

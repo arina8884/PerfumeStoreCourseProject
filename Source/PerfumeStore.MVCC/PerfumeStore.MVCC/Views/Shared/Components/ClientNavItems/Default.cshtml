@@ -1,0 +1,30 @@
+@model ClientNavBadgesViewModel
+
+<a class="store-header-icon" asp-controller="Compare" asp-action="Index" title="Сравнение">
+    <i class="bi bi-sliders"></i>
+    @if (Model.CompareCount > 0)
+    {
+        <span class="store-header-badge">@Model.CompareCount</span>
+    }
+</a>
+<a class="store-header-icon" asp-controller="Favorites" asp-action="Index" title="Избранное">
+    <i class="bi bi-heart"></i>
+    @if (Model.FavoritesCount > 0)
+    {
+        <span class="store-header-badge">@Model.FavoritesCount</span>
+    }
+</a>
+<a class="store-header-icon" asp-controller="Cart" asp-action="Index" title="Корзина">
+    <i class="bi bi-cart3"></i>
+    @if (Model.CartCount > 0)
+    {
+        <span class="store-header-badge">@Model.CartCount</span>
+    }
+</a>
+<a class="btn btn-dark btn-sm" asp-controller="ClientProfile" asp-action="Dashboard">
+    <i class="bi bi-person-circle me-1"></i>Кабинет
+</a>
+<form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-outline-dark btn-sm" type="submit" title="Выход">Выход</button>
+</form>

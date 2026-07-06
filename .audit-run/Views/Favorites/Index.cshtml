@@ -1,0 +1,51 @@
+@model FavoriteListViewModel
+
+@{
+    ViewData["Title"] = "Избранное";
+    ViewData["MetaDescription"] = "Избранные ароматы PerfumeStore — сохранённые товары для быстрого доступа.";
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Избранное",
+    Subtitle = "Сохранённые ароматы, к которым можно быстро вернуться.",
+    Icon = "bi-heart"
+})" />
+
+@if (Model.Items.Count == 0)
+{
+    <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+        Title = "Избранное пусто",
+        Description = "Добавляйте понравившиеся товары из каталога или карточки товара.",
+        Icon = "bi-heart",
+        ButtonText = "Перейти в каталог",
+        ButtonController = "Catalog",
+        ButtonAction = "Index"
+    })" />
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var item in Model.Items)
+        {
+            <div class="col-md-6 col-lg-4">
+                <article class="product-card-store h-100 d-flex flex-column">
+                    <img class="w-100" style="height: 220px; object-fit: contain; background: #f7f7f7;" src="@ImageUrlHelper.GetProductImageUrl(item.ImageUrl)" alt="@item.Name" />
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <div class="text-muted small">@item.CategoryName</div>
+                        <h2 class="h6 mt-1">@item.Name</h2>
+                        <p class="text-muted small mb-1">@item.Brand · @item.Volume мл</p>
+                        <p class="fw-bold mb-3">@item.Price.ToString("N2") BYN</p>
+                        <div class="mt-auto d-grid gap-2">
+                            <a class="btn btn-dark" asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId">Подробнее</a>
+                            <form asp-controller="Favorites" asp-action="Remove" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button class="btn btn-outline-dark w-100" type="submit"><i class="bi bi-heart-break me-1"></i>Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

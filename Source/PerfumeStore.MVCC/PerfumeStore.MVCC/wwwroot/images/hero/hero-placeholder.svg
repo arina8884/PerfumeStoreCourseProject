@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" fill="none" role="img" aria-label="03;CH:0 Hero">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#faf9f7"/>
+      <stop offset="50%" stop-color="#f5efe6"/>
+      <stop offset="100%" stop-color="#ebe4dc"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="640" fill="url(#bg)"/>
+  <rect x="80" y="80" width="1040" height="480" rx="24" stroke="#ddd0ca" stroke-width="2" stroke-dasharray="12 8" fill="none"/>
+  <text x="600" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" fill="#9a928c" letter-spacing="0.08em">HERO MAIN</text>
+  <text x="600" y="350" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#b5aea8">>;>68B5 hero-main.webp 2 wwwroot/images/hero/</text>
+</svg>

@@ -1,0 +1,88 @@
+@model SiteFooterViewModel
+
+<footer class="store-footer border-top mt-auto">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="store-footer-title">Контакты</div>
+                <p class="small mb-1">
+                    <i class="bi bi-telephone me-2"></i>
+                    <a class="text-decoration-none text-muted" href="tel:+375290000000">+375 (29) 000-00-00</a>
+                </p>
+                <p class="small mb-1">
+                    <i class="bi bi-envelope me-2"></i>
+                    <a class="text-decoration-none text-muted" href="mailto:info@perfume.by">info@perfume.by</a>
+                </p>
+                <p class="small mb-0">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <a class="text-decoration-none text-muted" asp-controller="Home" asp-action="Index" asp-fragment="contacts">г. Минск, пр-т Независимости, 1</a>
+                </p>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="store-footer-title">Покупателям</div>
+                <nav class="store-footer-nav">
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="delivery-info">Доставка</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="payment-info">Оплата</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="return-info">Возврат</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="faq-info">Частые вопросы</a>
+                </nav>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="store-footer-title">Информация</div>
+                <nav class="store-footer-nav">
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="about">О магазине</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="privacy-info">Политика конфиденциальности</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="terms-info">Пользовательское соглашение</a>
+                </nav>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="store-footer-title">Категории</div>
+                @if (Model.Categories.Count == 0)
+                {
+                    <div class="store-footer-empty">
+                        <i class="bi bi-grid mb-2"></i>
+                        <div class="small fw-semibold">Категории скоро появятся</div>
+                        <a class="small" asp-controller="Catalog" asp-action="Index">Перейти в каталог</a>
+                    </div>
+                }
+                else
+                {
+                    <nav class="store-footer-nav">
+                        @foreach (var category in Model.Categories.Take(5))
+                        {
+                            <a asp-controller="Catalog" asp-action="ByCategory" asp-route-id="@category.Id">@category.Name</a>
+                        }
+                    </nav>
+                }
+            </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-6 col-lg-4">
+                <div class="store-footer-title">Навигация</div>
+                <nav class="store-footer-nav">
+                    <a asp-controller="Home" asp-action="Index">Главная</a>
+                    <a asp-controller="Catalog" asp-action="Index">Каталог</a>
+                    @if (User.IsInRole(UserRoles.Client))
+                    {
+                        <a asp-controller="ClientProfile" asp-action="Dashboard">Личный кабинет</a>
+                    }
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="contacts">Контакты</a>
+                </nav>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="store-footer-title">Социальные сети</div>
+                <div class="store-social-links d-flex gap-2">
+                    <a href="https://instagram.com" class="store-social-link" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>
+                    <a href="https://t.me" class="store-social-link" title="Telegram" target="_blank" rel="noopener noreferrer"><i class="bi bi-telegram"></i></a>
+                    <a href="https://vk.com" class="store-social-link" title="VK" target="_blank" rel="noopener noreferrer"><i class="bi bi-vk"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+        <div class="text-center small text-muted">
+            PerfumeStore &copy; 2026. Все права защищены.
+        </div>
+    </div>
+</footer>

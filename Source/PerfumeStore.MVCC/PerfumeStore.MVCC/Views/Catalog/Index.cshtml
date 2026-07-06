@@ -2,75 +2,201 @@
 
 @{
     ViewData["Title"] = "Каталог";
+    ViewData["MetaDescription"] = "Каталог парфюмерии PerfumeStore — фильтры по бренду, категории, цене и наличию.";
+    var filter = Model.Filter;
+    var hasActiveFilters = !string.IsNullOrWhiteSpace(filter.SearchQuery)
+        || filter.CategoryId.HasValue
+        || !string.IsNullOrWhiteSpace(filter.Brand)
+        || filter.Volume.HasValue
+        || filter.MinPrice.HasValue
+        || filter.MaxPrice.HasValue
+        || !string.IsNullOrWhiteSpace(filter.StockFilter)
+        || !string.IsNullOrWhiteSpace(filter.SortBy);
+    string? GetCategoryName(int? categoryId) =>
+        categoryId is null ? null : Model.Categories.FirstOrDefault(c => c.Id == categoryId)?.Name;
+    string? GetStockLabel(string? stockFilter) => stockFilter switch
+    {
+        "in_stock" => "В наличии",
+        "low" => "Заканчивается",
+        "out_of_stock" => "Нет в наличии",
+        _ => null
+    };
+    string? GetSortLabel(string? sortBy) => sortBy switch
+    {
+        "price_asc" => "Цена по возрастанию",
+        "price_desc" => "Цена по убыванию",
+        "newest" => "По новизне",
+        "stock_desc" => "По остатку",
+        _ => null
+    };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="mb-1">Каталог</h1>
-        <p class="text-muted mb-0">Все активные товары из базы данных.</p>
-    </div>
-</div>
+<partial name="_Breadcrumb" model="@(new[] {
+    ("Главная", Url.Action("Index", "Home"), false),
+    ("Каталог", null, true)
+})" />
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = "Каталог",
+    Subtitle = "Фильтры по цене, бренду, объёму и наличию",
+    Icon = "bi-grid"
+})" />
 
 <div class="row g-4">
     <aside class="col-lg-3">
-        <div class="border rounded-3 p-3">
-            <h2 class="h5">Фильтр</h2>
+        <div class="catalog-filter-panel">
+            <h2 class="h5 mb-3">Фильтры</h2>
             <form asp-controller="Catalog" asp-action="Index" method="get">
                 <div class="mb-3">
                     <label class="form-label" for="SearchQuery">Поиск</label>
-                    <input class="form-control" id="SearchQuery" name="SearchQuery" value="@Model.Filter.SearchQuery" placeholder="Название или бренд" />
+                    <input class="form-control" id="SearchQuery" name="SearchQuery" value="@filter.SearchQuery" placeholder="Название или бренд" />
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label" for="CategoryId">Категория</label>
                     <select class="form-select" id="CategoryId" name="CategoryId">
                         <option value="">Все категории</option>
                         @foreach (var category in Model.Categories)
                         {
-                            <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">
-                                @category.Name
-                            </option>
+                            if (filter.CategoryId == category.Id)
+                            {
+                                <option value="@category.Id" selected>@category.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
                         }
                     </select>
                 </div>
-
+                <div class="mb-3">
+                    <label class="form-label" for="Brand">Бренд</label>
+                    <select class="form-select" id="Brand" name="Brand">
+                        <option value="">Все бренды</option>
+                        @foreach (var brand in Model.Brands)
+                        {
+                            if (filter.Brand == brand)
+                            {
+                                <option value="@brand" selected>@brand</option>
+                            }
+                            else
+                            {
+                                <option value="@brand">@brand</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Volume">Объём</label>
+                    <select class="form-select" id="Volume" name="Volume">
+                        <option value="">Любой</option>
+                        @foreach (var volume in Model.Volumes)
+                        {
+                            if (filter.Volume == volume)
+                            {
+                                <option value="@volume" selected>@volume мл</option>
+                            }
+                            else
+                            {
+                                <option value="@volume">@volume мл</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label" for="MinPrice">Цена от</label>
+                        <input class="form-control" id="MinPrice" name="MinPrice" type="number" step="0.01" min="0" value="@filter.MinPrice" placeholder="0" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label" for="MaxPrice">Цена до</label>
+                        <input class="form-control" id="MaxPrice" name="MaxPrice" type="number" step="0.01" min="0" value="@filter.MaxPrice" placeholder="999" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="StockFilter">Наличие</label>
+                    <select class="form-select" id="StockFilter" name="StockFilter">
+                        <option value="">Все</option>
+                        @if (filter.StockFilter == "in_stock") { <option value="in_stock" selected>В наличии</option> } else { <option value="in_stock">В наличии</option> }
+                        @if (filter.StockFilter == "low") { <option value="low" selected>Заканчивается</option> } else { <option value="low">Заканчивается</option> }
+                        @if (filter.StockFilter == "out_of_stock") { <option value="out_of_stock" selected>Нет в наличии</option> } else { <option value="out_of_stock">Нет в наличии</option> }
+                    </select>
+                </div>
                 <div class="mb-3">
                     <label class="form-label" for="SortBy">Сортировка</label>
                     <select class="form-select" id="SortBy" name="SortBy">
                         <option value="">По названию</option>
-                        <option value="price_asc" selected="@(Model.Filter.SortBy == "price_asc")">Цена по возрастанию</option>
-                        <option value="price_desc" selected="@(Model.Filter.SortBy == "price_desc")">Цена по убыванию</option>
-                        <option value="name" selected="@(Model.Filter.SortBy == "name")">По названию</option>
-                        <option value="newest" selected="@(Model.Filter.SortBy == "newest")">По новизне</option>
+                        @if (filter.SortBy == "price_asc") { <option value="price_asc" selected>Цена по возрастанию</option> } else { <option value="price_asc">Цена по возрастанию</option> }
+                        @if (filter.SortBy == "price_desc") { <option value="price_desc" selected>Цена по убыванию</option> } else { <option value="price_desc">Цена по убыванию</option> }
+                        @if (filter.SortBy == "newest") { <option value="newest" selected>По новизне</option> } else { <option value="newest">По новизне</option> }
+                        @if (filter.SortBy == "stock_desc") { <option value="stock_desc" selected>По остатку</option> } else { <option value="stock_desc">По остатку</option> }
                     </select>
                 </div>
-
-                <button class="btn btn-dark w-100" type="submit">Применить</button>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-dark" type="submit">Применить</button>
+                    <a class="btn btn-outline-secondary" asp-controller="Catalog" asp-action="Index">Сбросить</a>
+                </div>
             </form>
-
-            <hr />
-
-            <h3 class="h6">Категории</h3>
-            <div class="list-group">
-                <a class="list-group-item list-group-item-action" asp-controller="Catalog" asp-action="Index">Все товары</a>
-                @foreach (var category in Model.Categories)
-                {
-                    <a class="list-group-item list-group-item-action" href="/catalog/category/@category.Id">
-                        @category.Name
-                    </a>
-                }
-            </div>
         </div>
     </aside>
 
     <section class="col-lg-9">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted">Найдено товаров: @Model.Products.Count</span>
+        <div class="catalog-results-bar store-panel mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <span class="fw-semibold">Найдено товаров: @Model.Products.Count</span>
+                @if (hasActiveFilters)
+                {
+                    <a class="btn btn-sm btn-outline-dark" asp-controller="Catalog" asp-action="Index"><i class="bi bi-x-lg me-1"></i>Сбросить фильтры</a>
+                }
+            </div>
+            @if (hasActiveFilters)
+            {
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    @if (!string.IsNullOrWhiteSpace(filter.SearchQuery))
+                    {
+                        <span class="badge text-bg-light border">Поиск: @filter.SearchQuery</span>
+                    }
+                    @if (filter.CategoryId.HasValue)
+                    {
+                        <span class="badge text-bg-light border">Категория: @GetCategoryName(filter.CategoryId)</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(filter.Brand))
+                    {
+                        <span class="badge text-bg-light border">Бренд: @filter.Brand</span>
+                    }
+                    @if (filter.Volume.HasValue)
+                    {
+                        <span class="badge text-bg-light border">Объём: @filter.Volume мл</span>
+                    }
+                    @if (filter.MinPrice.HasValue)
+                    {
+                        <span class="badge text-bg-light border">От @filter.MinPrice BYN</span>
+                    }
+                    @if (filter.MaxPrice.HasValue)
+                    {
+                        <span class="badge text-bg-light border">До @filter.MaxPrice BYN</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(filter.StockFilter))
+                    {
+                        <span class="badge text-bg-light border">@GetStockLabel(filter.StockFilter)</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                    {
+                        <span class="badge text-bg-light border">@GetSortLabel(filter.SortBy)</span>
+                    }
+                </div>
+            }
         </div>
 
         @if (Model.Products.Count == 0)
         {
-            <div class="alert alert-light border">Товары не найдены.</div>
+            <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+                Title = "Товары не найдены",
+                Description = "Измените параметры фильтра или сбросьте их, чтобы увидеть больше ароматов",
+                Icon = "bi-search",
+                ButtonText = "Сбросить фильтры",
+                ButtonController = "Catalog",
+                ButtonAction = "Index"
+            })" />
         }
         else
         {
@@ -78,32 +204,7 @@
                 @foreach (var product in Model.Products)
                 {
                     <div class="col-md-6 col-xl-4">
-                        <div class="card h-100">
-                            <img class="card-img-top bg-light" src="@(product.ImageUrl ?? "/images/products/no-image.png")" alt="@product.Name" />
-                            <div class="card-body d-flex flex-column">
-                                <div class="text-muted small">@product.CategoryName</div>
-                                <div class="text-muted small">@product.Brand</div>
-                                <h2 class="h5">@product.Name</h2>
-                                <p class="mb-1">Объем: @product.Volume мл</p>
-                                <p class="mb-1">Остаток: @product.StockQuantity</p>
-                                <p class="fw-bold">@product.Price.ToString("N2")</p>
-                                <div class="mt-auto d-grid gap-2">
-                                    <a class="btn btn-outline-dark" href="/product/@product.Id">Подробнее</a>
-                                    @if (User.IsInRole(UserRoles.Client))
-                                    {
-                                        <form asp-controller="Cart" asp-action="Add" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="productId" value="@product.Id" />
-                                            <input type="hidden" name="quantity" value="1" />
-                                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                                            <button class="btn btn-dark w-100" type="submit" disabled="@(product.StockQuantity <= 0)">
-                                                В корзину
-                                            </button>
-                                        </form>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                        <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", true }, { "ReturnUrl", Context.Request.Path + Context.Request.QueryString } }' />
                     </div>
                 }
             </div>

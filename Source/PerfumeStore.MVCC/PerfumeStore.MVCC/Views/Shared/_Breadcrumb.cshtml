@@ -1,0 +1,21 @@
+@model IEnumerable<(string Label, string? Url, bool IsActive)>
+
+<nav aria-label="breadcrumb" class="store-breadcrumb mb-4">
+    <ol class="breadcrumb mb-0">
+        @foreach (var item in Model)
+        {
+            if (item.IsActive)
+            {
+                <li class="breadcrumb-item active" aria-current="page">@item.Label</li>
+            }
+            else if (!string.IsNullOrWhiteSpace(item.Url))
+            {
+                <li class="breadcrumb-item"><a href="@item.Url">@item.Label</a></li>
+            }
+            else
+            {
+                <li class="breadcrumb-item">@item.Label</li>
+            }
+        }
+    </ol>
+</nav>

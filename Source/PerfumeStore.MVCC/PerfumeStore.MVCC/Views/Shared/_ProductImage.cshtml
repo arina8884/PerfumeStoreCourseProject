@@ -1,0 +1,14 @@
+@{
+    var imageUrl = ViewData["ImageUrl"] as string;
+    var alt = ViewData["ImageAlt"] as string ?? string.Empty;
+    var cssClass = ViewData["ImageClass"] as string ?? "store-product-image";
+    var src = ImageUrlHelper.GetProductImageUrl(imageUrl);
+    var placeholder = ImageUrlHelper.Placeholder;
+}
+
+<img class="@cssClass"
+     id="@(ViewData["ImageId"] as string)"
+     src="@src"
+     alt="@alt"
+     loading="lazy"
+     onerror="this.onerror=null;this.src='@placeholder';" />

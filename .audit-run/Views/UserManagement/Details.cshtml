@@ -1,0 +1,31 @@
+@model UserDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.FullName;
+}
+
+<partial name="_PageHeader" model="@(new PageHeaderViewModel {
+    Title = Model.FullName,
+    Subtitle = "Профиль пользователя и сводная информация.",
+    Icon = "bi-person-badge"
+})" />
+
+<div class="store-panel mb-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+        <dt class="col-sm-3">Телефон</dt>
+        <dd class="col-sm-9">@(Model.Phone ?? "—")</dd>
+        <dt class="col-sm-3">Роль</dt>
+        <dd class="col-sm-9"><partial name="_UserRoleBadge" model="@Model.Role" /></dd>
+        <dt class="col-sm-3">Дата регистрации</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("g")</dd>
+        <dt class="col-sm-3">Заказов</dt>
+        <dd class="col-sm-9">@Model.OrdersCount</dd>
+    </dl>
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-dark" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil me-1"></i>Изменить</a>
+    <a class="btn btn-outline-dark" asp-action="Index"><i class="bi bi-arrow-left me-1"></i>К списку</a>
+</div>

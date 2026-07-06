@@ -1,0 +1,127 @@
+@model CompareViewModel
+
+@{
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="table-responsive compare-table-wrap">
+    <table class="table compare-table align-middle mb-0">
+        <thead>
+            <tr>
+                <th class="compare-feature-col">Характеристика</th>
+                @foreach (var product in Model.Products)
+                {
+                    <th class="compare-product-col text-center">
+                        <a class="text-dark text-decoration-none fw-semibold" asp-controller="Product" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">Изображение</th>
+                @foreach (var product in Model.Products)
+                {
+                    <td class="text-center">
+                        <partial name="_ProductImage" view-data='new ViewDataDictionary(ViewData) { { "ImageUrl", product.ImageUrl }, { "ImageAlt", product.Name }, { "ImageClass", "compare-product-image" } }' />
+                    </td>
+                }
+            </tr>
+            <tr>
+                <th scope="row">Название</th>
+                @foreach (var product in Model.Products)
+                {
+                    <td><a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id">@product.Name</a></td>
+                }
+            </tr>
+            <tr>
+                <th scope="row">Бренд</th>
+                @foreach (var product in Model.Products) { <td>@product.Brand</td> }
+            </tr>
+            <tr>
+                <th scope="row">Категория</th>
+                @foreach (var product in Model.Products) { <td>@product.CategoryName</td> }
+            </tr>
+            <tr>
+                <th scope="row">Объём</th>
+                @foreach (var product in Model.Products) { <td>@product.Volume мл</td> }
+            </tr>
+            <tr>
+                <th scope="row">Цена</th>
+                @foreach (var product in Model.Products) { <td class="fw-bold">@product.Price.ToString("N2") BYN</td> }
+            </tr>
+            <tr>
+                <th scope="row">Наличие</th>
+                @foreach (var product in Model.Products)
+                {
+                    <td><span class="badge @StockStatusHelper.ToBadgeClass(product.StockQuantity)">@product.StockStatusLabel</span></td>
+                }
+            </tr>
+            <tr>
+                <th scope="row">Рейтинг</th>
+                @foreach (var product in Model.Products)
+                {
+                    <td>
+                        @if (product.ReviewsCount > 0 && product.AverageRating.HasValue)
+                        {
+                            <span><i class="bi bi-star-fill text-warning me-1"></i>@product.AverageRating.Value.ToString("0.0") / 5</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Нет оценок</span>
+                        }
+                    </td>
+                }
+            </tr>
+            <tr>
+                <th scope="row">Количество отзывов</th>
+                @foreach (var product in Model.Products) { <td>@product.ReviewsCount</td> }
+            </tr>
+            <tr>
+                <th scope="row">Описание</th>
+                @foreach (var product in Model.Products)
+                {
+                    <td class="compare-description-cell">@(product.Description ?? "Описание отсутствует.")</td>
+                }
+            </tr>
+            @if (User.IsInRole(UserRoles.Client))
+            {
+                <tr>
+                    <th scope="row">Действия</th>
+                    @foreach (var product in Model.Products)
+                    {
+                        <td>
+                            <div class="d-grid gap-2">
+                                @if (product.StockQuantity > 0)
+                                {
+                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button class="btn btn-dark btn-sm w-100" type="submit"><i class="bi bi-cart-plus me-1"></i>В корзину</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary w-100 py-2">Нет в наличии</span>
+                                }
+                                <form asp-controller="Favorites" asp-action="Add" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                    <button class="btn btn-outline-dark btn-sm w-100" type="submit"><i class="bi bi-heart me-1"></i>В избранное</button>
+                                </form>
+                                <form asp-controller="Compare" asp-action="Remove" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <button class="btn btn-outline-secondary btn-sm w-100" type="submit"><i class="bi bi-x-lg me-1"></i>Убрать</button>
+                                </form>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

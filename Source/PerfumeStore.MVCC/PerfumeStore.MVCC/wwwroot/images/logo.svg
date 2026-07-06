@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 32" fill="none" role="img" aria-label="PerfumeStore">
+  <text x="0" y="23" font-family="'Instrument Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#353330" letter-spacing="-0.03em">perfume</text>
+  <text x="92" y="23" font-family="'Instrument Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="300" fill="#9a928c" letter-spacing="-0.01em">store</text>
+  <line x1="0" y1="29" x2="168" y2="29" stroke="#ddd0ca" stroke-width="1"/>
+</svg>

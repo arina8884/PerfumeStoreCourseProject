@@ -1,0 +1,255 @@
+@model ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    ViewData["MetaDescription"] = $"Купить {Model.Name} ({Model.Brand}) в PerfumeStore. Цена {Model.Price:N2} BYN, объём {Model.Volume} мл.";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<partial name="_Breadcrumb" model="@(new[] {
+    ("Главная", Url.Action("Index", "Home"), false),
+    ("Каталог", Url.Action("Index", "Catalog"), false),
+    (Model.Name, null, true)
+})" />
+
+<div class="row g-5 product-details-layout">
+    <div class="col-lg-6">
+        <div class="product-gallery-main store-panel p-3 mb-3 text-center">
+            <partial name="_ProductImage" view-data='new ViewDataDictionary(ViewData) { { "ImageUrl", Model.ImageUrl }, { "ImageAlt", Model.Name }, { "ImageClass", "img-fluid w-100 product-main-image" }, { "ImageId", "product-main-image" } }' />
+        </div>
+        <div class="d-flex gap-2">
+            <button class="product-gallery-thumb border-2" type="button" data-image="@ImageUrlHelper.GetProductImageUrl(Model.ImageUrl)" aria-label="Основное фото">
+                <partial name="_ProductImage" view-data='new ViewDataDictionary(ViewData) { { "ImageUrl", Model.ImageUrl }, { "ImageAlt", Model.Name }, { "ImageClass", "img-fluid product-gallery-thumb-image" } }' />
+            </button>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <h1 class="h2 mb-2">@Model.Name</h1>
+        <div class="product-summary-list mb-3">
+            <div><span class="label">Бренд</span><span class="value">@Model.Brand</span></div>
+            <div><span class="label">Категория</span><span class="value">@Model.CategoryName</span></div>
+            <div><span class="label">Объём</span><span class="value">@Model.Volume мл</span></div>
+        </div>
+
+        <div class="store-panel product-stock-panel product-stock-@StockStatusHelper.GetStatus(Model.StockQuantity) mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-box-seam"></i>
+                <div>
+                    <div class="fw-semibold">@StockStatusHelper.ToDisplayName(Model.StockQuantity)</div>
+                    <div class="small text-muted">На складе: @Model.StockQuantity шт.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+            @if (Model.ReviewsCount > 0 && Model.AverageRating.HasValue)
+            {
+                <span class="fs-5 fw-semibold"><i class="bi bi-star-fill text-warning me-1"></i>@Model.AverageRating.Value.ToString("0.0") / 5</span>
+                <span class="text-muted">@Model.ReviewsCount @(Model.ReviewsCount == 1 ? "отзыв" : "отзывов")</span>
+            }
+            else
+            {
+                <span class="text-muted"><i class="bi bi-star me-1"></i>Пока нет оценок</span>
+            }
+        </div>
+
+        <p class="fs-3 fw-bold mb-4">@Model.Price.ToString("N2") <span class="fs-6 text-muted">BYN</span></p>
+
+        <div class="store-panel mb-4">
+            <div class="store-panel-title mb-2"><i class="bi bi-card-text me-2"></i>Описание</div>
+            <p class="text-muted mb-0">@(Model.Description ?? "Описание отсутствует.")</p>
+        </div>
+
+        <div class="store-panel mb-4">
+            <div class="store-panel-title mb-3"><i class="bi bi-list-ul me-2"></i>Характеристики</div>
+            <div class="product-meta-grid mb-0">
+                <div class="product-meta-item"><div class="label">Бренд</div><div class="value">@Model.Brand</div></div>
+                <div class="product-meta-item"><div class="label">Категория</div><div class="value">@Model.CategoryName</div></div>
+                <div class="product-meta-item"><div class="label">Объём</div><div class="value">@Model.Volume мл</div></div>
+                <div class="product-meta-item"><div class="label">Остаток</div><div class="value">@Model.StockQuantity шт.</div></div>
+            </div>
+        </div>
+
+        <div class="store-panel">
+            <div class="store-panel-title mb-3"><i class="bi bi-hand-index me-2"></i>Действия</div>
+            <div class="d-flex flex-wrap gap-2">
+                @if (User.IsInRole(UserRoles.Client))
+                {
+                    @if (Model.StockQuantity > 0)
+                    {
+                        <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <input class="form-control product-qty-input" type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" />
+                            <button class="btn btn-dark" type="submit"><i class="bi bi-cart-plus me-1"></i>В корзину</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary align-self-center py-2 px-3">Нет в наличии</span>
+                    }
+
+                    @if (Model.IsInFavorites)
+                    {
+                        <form asp-controller="Favorites" asp-action="Remove" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button class="btn btn-outline-dark" type="submit"><i class="bi bi-heart-fill me-1"></i>В избранном</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Favorites" asp-action="Add" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button class="btn btn-outline-dark" type="submit"><i class="bi bi-heart me-1"></i>В избранное</button>
+                        </form>
+                    }
+
+                    <form asp-controller="Compare" asp-action="Add" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button class="btn btn-outline-dark" type="submit"><i class="bi bi-sliders me-1"></i>Сравнить</button>
+                    </form>
+                }
+                else
+                {
+                    <a class="btn btn-dark" asp-controller="Account" asp-action="Login"><i class="bi bi-box-arrow-in-right me-1"></i>Войти для покупки</a>
+                }
+
+                <a class="btn btn-outline-secondary" href="#reviews"><i class="bi bi-chat-left-text me-1"></i>Отзывы (@Model.ReviewsCount)</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="mt-5" id="reviews">
+    <partial name="_PageHeader" model="@(new PageHeaderViewModel {
+        Title = "Отзывы покупателей",
+        Subtitle = Model.ReviewsCount > 0 ? "Средняя оценка и мнения клиентов о товаре." : "Будьте первым, кто оставит отзыв.",
+        Icon = "bi-chat-square-quote"
+    })" />
+
+    @if (Model.Reviews.Count == 0)
+    {
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+            Title = "Отзывов пока нет",
+            Description = "Оцените аромат после покупки — это поможет другим покупателям.",
+            Icon = "bi-chat"
+        })" />
+    }
+    else
+    {
+        <div class="row g-3 mb-4">
+            @foreach (var review in Model.Reviews)
+            {
+                <div class="col-md-6">
+                    <div class="review-card h-100">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                            <div>
+                                <strong>@review.UserFullName</strong>
+                                <div class="text-muted small">@review.ReviewDate.ToString("g")</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge text-bg-dark"><i class="bi bi-star-fill me-1"></i>@review.Rating / 5</span>
+                                @if (review.IsOwnReview)
+                                {
+                                    <a class="btn btn-sm btn-outline-dark" asp-controller="Reviews" asp-action="Edit" asp-route-id="@review.ReviewId">Изменить</a>
+                                    <form asp-controller="Reviews" asp-action="Delete" asp-route-id="@review.ReviewId" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                        <p class="mb-0">@(review.Comment ?? "Без комментария")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (User.IsInRole(UserRoles.Client) && Model.CanLeaveReview)
+    {
+        <div class="store-panel">
+            <div class="store-panel-title"><i class="bi bi-pencil me-2"></i>Оставить отзыв</div>
+            <form asp-controller="Reviews" asp-action="Create" method="post" class="store-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ProductId" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label" for="Rating">Оценка</label>
+                        <select class="form-select" id="Rating" name="Rating" required>
+                            <option value="">—</option>
+                            @for (var rating = 5; rating >= 1; rating--)
+                            {
+                                <option value="@rating">@rating</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="Comment">Комментарий</label>
+                        <textarea class="form-control" id="Comment" name="Comment" rows="4" maxlength="1000" placeholder="Поделитесь впечатлением о товаре"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-dark mt-3" type="submit">Отправить отзыв</button>
+            </form>
+        </div>
+    }
+    else if (User.IsInRole(UserRoles.Client) && !Model.CanLeaveReview)
+    {
+        <div class="alert alert-light border mb-0">Вы уже оставляли отзыв на этот товар. Его можно изменить или удалить выше.</div>
+    }
+</section>
+
+@if (Model.SimilarProducts.Count > 0)
+{
+    <section class="mt-5">
+        <partial name="_PageHeader" model="@(new PageHeaderViewModel {
+            Title = "Похожие товары",
+            Subtitle = "Ароматы той же категории или бренда.",
+            Icon = "bi-collection"
+        })" />
+        <div class="row g-4">
+            @foreach (var product in Model.SimilarProducts)
+            {
+                <div class="col-6 col-lg-3 d-flex">
+                    <partial name="_ProductCard" model="product" view-data='new ViewDataDictionary(ViewData) { { "ShowActions", User.IsInRole(UserRoles.Client) } }' />
+                </div>
+            }
+        </div>
+    </section>
+}
+else
+{
+    <section class="mt-5">
+        <partial name="_EmptyState" model="@(new EmptyStateViewModel {
+            Title = "Похожих товаров нет",
+            Description = "Посмотрите другие ароматы в каталоге.",
+            Icon = "bi-collection",
+            ButtonText = "Перейти в каталог",
+            ButtonController = "Catalog",
+            ButtonAction = "Index"
+        })" />
+    </section>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-image]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var image = document.getElementById('product-main-image');
+                if (image) {
+                    image.src = button.getAttribute('data-image');
+                }
+            });
+        });
+    </script>
+}

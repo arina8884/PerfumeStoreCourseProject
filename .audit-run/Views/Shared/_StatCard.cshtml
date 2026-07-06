@@ -1,0 +1,17 @@
+@model StatCardViewModel
+
+<div class="store-stat-card h-100">
+    <div class="d-flex justify-content-between align-items-start gap-2">
+        <div>
+            <div class="store-stat-label">@Model.Label</div>
+            <div class="store-stat-value">@Model.Value</div>
+            @if (!string.IsNullOrWhiteSpace(Model.Hint))
+            {
+                <div class="store-stat-hint">@Model.Hint</div>
+            }
+        </div>
+        <div class="store-stat-icon">
+            <i class="bi @Model.Icon"></i>
+        </div>
+    </div>
+</div>
