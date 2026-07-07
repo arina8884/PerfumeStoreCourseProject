@@ -1,0 +1,15 @@
+Исходник: c:\Users\user\Desktop\PerfumeStore_NEW\PerfumeStoreCourseProject\Documentation\ПЗКурсовая_backup_20260707_185855.docx
+Резервная копия: c:\Users\user\Desktop\PerfumeStore_NEW\PerfumeStoreCourseProject\Documentation\ПЗКурсовая_backup_20260707_191749.docx
+Сохранено как: c:\Users\user\Desktop\PerfumeStore_NEW\PerfumeStoreCourseProject\Documentation\ПЗКурсовая_backup_20260707_185855.docx
+Время: 2026-07-07T19:17:56
+
+Выполнено:
+- поля 30/15/20/20 мм
+- Times New Roman 14, одинарный интервал, абзац 1.25 см
+- заголовки: полужирные, по ширине, интервалы 14/28 пт
+- подписи рисунков по центру, таблиц — слева
+- списки с дефисами
+- код в приложении: Consolas 11
+- нумерация источников
+- содержание с номерами страниц (оценка по разметке Word)
+- номера страниц в колонтитуле справа
